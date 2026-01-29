@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useNostr } from '@nostrify/react';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { NSecSigner } from '@nostrify/nostrify';
+import { getPublicKey } from 'nostr-tools';
 
 interface PaymentNotification {
   type: 'incoming' | 'outgoing';
@@ -47,6 +47,17 @@ function parseNWCUri(uri: string): { walletPubkey: string; secret: string; relay
 }
 
 /**
+ * Convert hex string to Uint8Array
+ */
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  }
+  return bytes;
+}
+
+/**
  * Hook to subscribe to NWC payment notifications (kind 23196/23197)
  * 
  * This provides real-time payment detection instead of polling.
@@ -54,41 +65,51 @@ function parseNWCUri(uri: string): { walletPubkey: string; secret: string; relay
  */
 export function useNWCNotifications({ connectionString, onPaymentReceived, enabled = true }: UseNWCNotificationsOptions) {
   const { nostr } = useNostr();
-  const { user } = useCurrentUser();
   const [isConnected, setIsConnected] = useState(false);
   const [lastNotification, setLastNotification] = useState<PaymentNotification | null>(null);
   const subscriptionRef = useRef<{ close: () => void } | null>(null);
   const signerRef = useRef<NSecSigner | null>(null);
+  const clientPubkeyRef = useRef<string | null>(null);
 
-  // Parse connection string and create signer
+  // Parse connection string
   const parsed = connectionString ? parseNWCUri(connectionString) : null;
 
-  // Create signer from secret when connection string changes
+  // Create signer and derive client pubkey from secret
   useEffect(() => {
     if (!parsed?.secret) {
       signerRef.current = null;
+      clientPubkeyRef.current = null;
       return;
     }
 
     try {
-      // Convert hex secret to Uint8Array
-      const secretBytes = new Uint8Array(32);
-      for (let i = 0; i < 32; i++) {
-        secretBytes[i] = parseInt(parsed.secret.slice(i * 2, i * 2 + 2), 16);
-      }
+      const secretBytes = hexToBytes(parsed.secret);
       signerRef.current = new NSecSigner(secretBytes);
+      
+      // Derive client pubkey from secret using nostr-tools
+      clientPubkeyRef.current = getPublicKey(secretBytes);
+      
+      console.log('[NWC Notifications] Client pubkey derived:', clientPubkeyRef.current.slice(0, 16) + '...');
     } catch (err) {
       console.error('[NWC Notifications] Failed to create signer from secret:', err);
       signerRef.current = null;
+      clientPubkeyRef.current = null;
     }
   }, [parsed?.secret]);
 
   // Process incoming notification event
-  const processNotification = useCallback(async (event: { kind: number; content: string; pubkey: string }) => {
-    if (!signerRef.current?.nip44 || !parsed?.walletPubkey) return;
+  const processNotification = useCallback(async (event: { kind: number; content: string; pubkey: string; tags: string[][] }) => {
+    if (!signerRef.current?.nip44 || !parsed?.walletPubkey || !clientPubkeyRef.current) return;
 
     // Verify event is from the wallet service
     if (event.pubkey !== parsed.walletPubkey) {
+      return;
+    }
+
+    // Verify the notification is addressed to our client pubkey
+    const pTag = event.tags.find(([t]) => t === 'p');
+    if (pTag && pTag[1] !== clientPubkeyRef.current) {
+      // This notification is for a different client
       return;
     }
 
@@ -118,6 +139,7 @@ export function useNWCNotifications({ connectionString, onPaymentReceived, enabl
           settled_at: payload.notification.settled_at,
         };
 
+        console.log('[NWC Notifications] Payment received:', notification);
         setLastNotification(notification);
         onPaymentReceived?.(notification);
       }
@@ -128,55 +150,63 @@ export function useNWCNotifications({ connectionString, onPaymentReceived, enabl
 
   // Subscribe to notification events
   useEffect(() => {
-    if (!enabled || !parsed || !signerRef.current) {
+    if (!enabled || !parsed || !signerRef.current || !clientPubkeyRef.current) {
       setIsConnected(false);
       return;
     }
 
     const { walletPubkey, relays } = parsed;
-
-    // Get the client pubkey from the signer
-    let clientPubkey: string;
-    try {
-      // NSecSigner exposes the pubkey
-      const signer = signerRef.current;
-      // We need to derive pubkey from secret - for now use a workaround
-      // The signer should have a way to get the pubkey
-      clientPubkey = ''; // Will be set by subscription filter using #p tag
-    } catch {
-      return;
-    }
+    const clientPubkey = clientPubkeyRef.current;
 
     // Connect to the wallet service's relays
     const relayGroup = nostr.group(relays);
 
-    // Subscribe to kind 23196 (NIP-04) and 23197 (NIP-44) notification events
-    // Filter by p-tag targeting our client pubkey
+    let cancelled = false;
+
+    // Subscribe to notification events filtered by:
+    // - kinds: 23196 (NIP-04) and 23197 (NIP-44)
+    // - authors: wallet service pubkey
+    // - #p: our client pubkey (so we only receive our notifications)
     const subscribe = async () => {
       try {
-        // For now, subscribe without p-tag filter (wallet will send to us)
-        // In production, derive client pubkey from secret and filter properly
+        console.log('[NWC Notifications] Subscribing to relays:', relays);
+        console.log('[NWC Notifications] Filter: authors=%s, #p=%s', walletPubkey.slice(0, 16) + '...', clientPubkey.slice(0, 16) + '...');
+        
         const sub = relayGroup.req([
-          { kinds: [23196, 23197], authors: [walletPubkey], limit: 50 }
+          { 
+            kinds: [23196, 23197], 
+            authors: [walletPubkey], 
+            '#p': [clientPubkey],
+            limit: 50 
+          }
         ]);
 
-        setIsConnected(true);
+        if (!cancelled) {
+          setIsConnected(true);
+        }
 
         for await (const msg of sub) {
+          if (cancelled) break;
+          
           if (msg[0] === 'EVENT') {
-            const event = msg[2];
+            const event = msg[2] as { kind: number; content: string; pubkey: string; tags: string[][] };
             await processNotification(event);
+          } else if (msg[0] === 'EOSE') {
+            console.log('[NWC Notifications] End of stored events, now listening for new notifications');
           }
         }
       } catch (err) {
         console.error('[NWC Notifications] Subscription error:', err);
-        setIsConnected(false);
+        if (!cancelled) {
+          setIsConnected(false);
+        }
       }
     };
 
     subscribe();
 
     return () => {
+      cancelled = true;
       subscriptionRef.current?.close();
       setIsConnected(false);
     };
@@ -185,6 +215,7 @@ export function useNWCNotifications({ connectionString, onPaymentReceived, enabl
   return {
     isConnected,
     lastNotification,
+    clientPubkey: clientPubkeyRef.current,
   };
 }
 
