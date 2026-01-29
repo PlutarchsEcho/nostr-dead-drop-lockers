@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import qrcode from 'qrcode';
+import { useNWC } from '@/hooks/useNWCContext';
+import { LN } from '@getalby/sdk';
 
 interface InvoiceModalProps {
   open: boolean;
   invoice: string;
   onClose: () => void;
-  onPay: () => Promise<string>; // returns preimage
+  onPay: () => Promise<string>;
 }
 
 export function InvoiceModal({ open, invoice, onClose, onPay }: InvoiceModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const nwc = useNWC();
 
   useEffect(() => {
     if (!invoice) return;
@@ -23,6 +26,13 @@ export function InvoiceModal({ open, invoice, onClose, onPay }: InvoiceModalProp
       .catch(() => { if (mounted) setQrDataUrl(null); });
     return () => { mounted = false; };
   }, [invoice]);
+
+  useEffect(() => {
+    if (!open) return;
+    setMessage(null);
+    // If NWC notifications are implemented, we could subscribe here to the chosen wallet's relay
+    // and auto-close when a payment_received notification matching the invoice payment_hash is received.
+  }, [open]);
 
   const handleCopy = async () => {
     try {
@@ -41,7 +51,6 @@ export function InvoiceModal({ open, invoice, onClose, onPay }: InvoiceModalProp
     try {
       const preimage = await onPay();
       setMessage('Payment successful');
-      // leave modal open for a moment so UI can show success
       setTimeout(() => { setPaying(false); onClose(); }, 1200);
       return preimage;
     } catch (err: any) {
