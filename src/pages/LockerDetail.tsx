@@ -1,8 +1,7 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useSeoMeta } from '@unhead/react';
-import { useQuery } from '@tanstack/react-query';
 import { useNostr } from '@nostrify/react';
+import { useQuery } from '@tanstack/react-query';
+import { useSeoMeta } from '@unhead/react';
 import { parseLockerEvent } from '@/lib/lockerTypes';
 import { useNWC } from '@/hooks/useNWCContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -11,96 +10,63 @@ import { useTrustScore } from '@/hooks/useTrustScore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
+import { LN } from '@getalby/sdk';
 
-export default function LockerDetailPage() {
-  const { nip19 } = useParams();
+export default function LockerDetail() {
+  const { nip19 } = useParams<{ nip19: string }>();
   useSeoMeta({ title: 'Locker Details' });
   const { nostr } = useNostr();
   const nwc = useNWC();
-  const { user } = useCurrentUser();
   const { mutateAsync: publish } = useNostrPublish();
-
-  // Expecting an naddr-style identifier for addressable event (naddr includes pubkey + kind + d)
-  const decoded = nip19 ? (() => {
-    try {
-      // decode using nostr-tools only as needed — pages already have NIP19Page, but here simple handling
-      // We'll query by d+kind+author if nip19 is an naddr; otherwise attempt to find by d param
-      return nip19;
-    } catch {
-      return nip19;
-    }
-  })() : null;
-
-  const { data: events } = useQuery({
-    queryKey: ['locker-detail', decoded],
+  const { user } = useCurrentUser();
+  const { data: locker } = useQuery({
+    queryKey: ['locker-detail', nip19],
     queryFn: async () => {
-      if (!decoded) return null;
-      // For now, search by d tag (decoded string may be the d value). We query kind 30402 events with that d tag
-      const evs = await nostr.query([{ kinds: [30402], '#d': [decoded], limit: 1 }]);
-      return evs[0] ? parseLockerEvent(evs[0]) : null;
+      if (!nip19) return null;
+      const events = await nostr.query([{ kinds: [30402], '#d': [nip19], limit: 1 }]);
+      if (!events || events.length === 0) return null;
+      return parseLockerEvent(events[0]);
     },
-    staleTime: 30_000,
+    staleTime: 60_000,
   });
 
-  const locker = events;
   const trust = useTrustScore(locker?.pubkey);
-
-  // Rental flow state
-  const [isRenting, setRenting] = useState(false);
+  const [renting, setRenting] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleRent = async () => {
     if (!locker) return;
-    if (!nwc) {
-      alert('Please connect a Nostr Wallet Connect (NWC) wallet in settings');
-      return;
-    }
-
-    const conn = nwc.getActiveConnection();
-    if (!conn) {
-      alert('No active NWC connection found');
+    const active = nwc.getActiveConnection();
+    if (!active) {
+      setMessage('No wallet connected. Open Wallet Connect and connect to a wallet.');
       return;
     }
 
     setRenting(true);
-
     try {
-      // Create an invoice via NWC: make_invoice
-      // For now use make_invoice via the LN SDK wrapper exposed in the hook
-      // We will request an invoice for locker.price sats
+      const client = new LN(active.connectionString);
       const amountMsat = locker.price * 1000;
-      // NOTE: getActiveConnection() returns object stored in localStorage; need to call nwc.sendPayment or implement makeInvoice in SDK
-
-      // Create invoice using LN.makeInvoice if available
-      const client = new (await import('@getalby/sdk')).LN(conn.connectionString);
-      const invoiceResult = await client.makeInvoice({ amount: amountMsat, description: `Locker rental ${locker.dTag}` });
-
-      // Present invoice to the user (invoiceResult.invoice)
-      const paid = confirm(`Pay invoice: ${invoiceResult.invoice}\n\nClick OK to pay using your connected wallet.`);
-      if (!paid) {
+      const invoice = await client.makeInvoice({ amount: amountMsat, description: `Locker rental ${locker.dTag}` });
+      const confirmPay = confirm(`Invoice: ${invoice.invoice}\nPay with connected wallet?`);
+      if (!confirmPay) {
         setRenting(false);
         return;
       }
-
-      // Use NWC client's pay() to send payment and get preimage
-      const payRes = await client.pay(invoiceResult.invoice);
+      const payRes = await client.pay(invoice.invoice);
       const preimage = payRes.preimage;
 
-      // Build encrypted unlock command and send as DM to locker owner/locker pubkey
-      const command = {
+      const unlockCmd = {
         action: 'unlock',
         locker_id: locker.dTag,
         payment_preimage: preimage,
-        rental_invoice: invoiceResult.invoice,
+        rental_invoice: invoice.invoice
       };
 
-      // Publish encrypted DM (kind 4) to locker pubkey using useNostrPublish which signs with current user's key
-      await publish({ kind: 4, content: JSON.stringify(command), tags: [['p', locker.pubkey]] });
-
-      setMessage('Rental successful — unlock command sent.');
+      // Publish unlock command as a DM to locker pubkey (encrypted DM)
+      await publish({ kind: 4, content: JSON.stringify(unlockCmd), tags: [['p', locker.pubkey]] });
+      setMessage('Unlock command sent. Waiting for hardware to unlock.');
     } catch (err: any) {
-      console.error(err);
-      setMessage(err.message || 'Payment failed');
+      setMessage(err?.message ?? 'Rental failed');
     } finally {
       setRenting(false);
     }
@@ -112,33 +78,31 @@ export default function LockerDetailPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <h1 className="text-2xl font-semibold">{locker.title}</h1>
+      <div className="card">
+        <CardHeader>
+          <CardTitle>{locker.title}</CardTitle>
+        </CardHeader>
+        <CardContent>
           <p className="text-sm text-muted-foreground">{locker.location || locker.geohash}</p>
-          <div className="mt-4 p-4 border rounded">
-            <p>{locker.description}</p>
-            <p className="mt-2">Dimensions: {locker.dimensions}</p>
-            <p>Fee: {locker.price} sats</p>
-            <p>Status: {locker.status}</p>
-            <p>Owner: {locker.pubkey}</p>
-            <p>Trust Score: {trust?.data?.score ?? '—'}</p>
-          </div>
-        </div>
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Rent this Locker</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Pay the rental fee to unlock the box.</p>
-              <div className="mt-4">
-                <Button onClick={handleRent} disabled={isRenting}>{isRenting ? 'Processing...' : `Pay ${locker.price} sats`}</Button>
-              </div>
-              {message && <p className="mt-3 text-sm">{message}</p>}
-            </CardContent>
-          </Card>
-        </div>
+          <p className="mt-2">Dimensions: {locker.dimensions}</p>
+          <p>Fee: {locker.price} sats</p>
+          <p>Owner: {locker.pubkey}</p>
+          <p>Trust Score: {trust?.data?.score ?? '—'}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{locker.description}</p>
+        </CardContent>
+      </div>
+
+      <div className="mt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Rent this Locker</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">This will create a rental invoice via your connected wallet and unlock the locker once paid.</p>
+            <Button onClick={handleRent} disabled={renting} className="mt-4">{renting ? 'Processing...' : `Rent for ${locker.price} sats`}</Button>
+            {message && <p className="mt-2 text-sm">{message}</p>}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
