@@ -5,20 +5,20 @@ import { useSeoMeta } from '@unhead/react';
 import { parseLockerEvent } from '@/lib/lockerTypes';
 import { useNWC } from '@/hooks/useNWCContext';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useNostrPublish } from '@/hooks/useNostrPublish';
 import { useTrustScore } from '@/hooks/useTrustScore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import { LN } from '@getalby/sdk';
+import useSendUnlockCommand from '@/hooks/useSendUnlockCommand';
 
 export default function LockerDetail() {
   const { nip19 } = useParams<{ nip19: string }>();
   useSeoMeta({ title: 'Locker Details' });
   const { nostr } = useNostr();
   const nwc = useNWC();
-  const { mutateAsync: publish } = useNostrPublish();
   const { user } = useCurrentUser();
+  const { mutateAsync: sendUnlock } = useSendUnlockCommand();
   const { data: locker } = useQuery({
     queryKey: ['locker-detail', nip19],
     queryFn: async () => {
@@ -55,16 +55,15 @@ export default function LockerDetail() {
       const payRes = await client.pay(invoice.invoice);
       const preimage = payRes.preimage;
 
-      const unlockCmd = {
-        action: 'unlock',
-        locker_id: locker.dTag,
-        payment_preimage: preimage,
-        rental_invoice: invoice.invoice
-      };
+      // Send unlock command via NIP-17
+      await sendUnlock({
+        recipientPubkey: locker.pubkey,
+        lockerId: locker.dTag,
+        paymentPreimage: preimage,
+        rentalInvoice: invoice.invoice,
+      });
 
-      // Publish unlock command as a DM to locker pubkey (encrypted DM)
-      await publish({ kind: 4, content: JSON.stringify(unlockCmd), tags: [['p', locker.pubkey]] });
-      setMessage('Unlock command sent. Waiting for hardware to unlock.');
+      setMessage('Unlock command sent via NIP-17. Waiting for hardware to unlock.');
     } catch (err: any) {
       setMessage(err?.message ?? 'Rental failed');
     } finally {
