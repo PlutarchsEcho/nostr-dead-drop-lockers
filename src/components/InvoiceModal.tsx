@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import qrcode from 'qrcode';
 import { useNWC } from '@/hooks/useNWCContext';
 import { LN } from '@getalby/sdk';
+import { useNWCNotifications } from '@/hooks/useNWCNotifications';
 import { Copy, CheckCircle2, Loader2, Zap, Clock, AlertCircle } from 'lucide-react';
 
 interface InvoiceModalProps {
@@ -26,6 +27,7 @@ export function InvoiceModal({ open, invoice, amountSats, onClose, onPay, onSett
   const [copied, setCopied] = useState(false);
   const [pollCount, setPollCount] = useState(0);
   const nwc = useNWC();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const maxPolls = 60; // 3 minutes at 3s intervals
 
   // Reset state when modal opens
@@ -48,9 +50,24 @@ export function InvoiceModal({ open, invoice, amountSats, onClose, onPay, onSett
     return () => { mounted = false; };
   }, [invoice]);
 
-  // Poll for invoice settlement
+  // Real-time notifications for settlement (preferred)
+  const { isConnected: notifConnected, lastNotification } = useNWCNotifications({
+    connectionString: nwc.getActiveConnection()?.connectionString ?? null,
+    enabled: open && !!invoice,
+    onPaymentReceived: async (notif) => {
+      if (!notif.preimage) return;
+      setPaymentState('success');
+      setMessage('Payment confirmed!');
+      if (onSettled) {
+        await onSettled({ preimage: notif.preimage });
+      }
+      setTimeout(() => onClose(), 2000);
+    },
+  });
+
+  // Fallback polling if notifications are not available
   useEffect(() => {
-    if (!open || !invoice) return;
+    if (!open || !invoice || notifConnected) return;
 
     const active = nwc.getActiveConnection();
     if (!active) return;
@@ -93,7 +110,7 @@ export function InvoiceModal({ open, invoice, amountSats, onClose, onPay, onSett
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [open, invoice, nwc, onClose, onSettled, pollCount]);
+  }, [open, invoice, nwc, onClose, onSettled, pollCount, notifConnected]);
 
   const handleCopy = async () => {
     try {
@@ -192,17 +209,27 @@ export function InvoiceModal({ open, invoice, amountSats, onClose, onPay, onSett
             </Button>
           </div>
 
-          {/* Polling Progress */}
-          {paymentState === 'pending' && pollCount > 0 && (
+          {/* Real-time or Polling Status */}
+          {paymentState === 'pending' && (
             <div className="space-y-1">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Loader2 className="h-3 w-3 animate-spin" />
-                  Waiting for payment...
+                  {notifConnected ? 'Listening for payment...' : 'Waiting for payment...'}
                 </span>
-                <span>{Math.floor((pollCount / maxPolls) * 100)}%</span>
+                {!notifConnected && pollCount > 0 && (
+                  <span>{Math.floor((pollCount / maxPolls) * 100)}%</span>
+                )}
               </div>
-              <Progress value={(pollCount / maxPolls) * 100} className="h-1" />
+              {!notifConnected && pollCount > 0 && (
+                <Progress value={(pollCount / maxPolls) * 100} className="h-1" />
+              )}
+              {notifConnected && (
+                <div className="flex items-center gap-1 text-xs text-green-600">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Real-time notifications active
+                </div>
+              )}
             </div>
           )}
 
