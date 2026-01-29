@@ -144,6 +144,24 @@ export default function LockerDetail() {
           if (renting) setRenting(false);
         }}
         onPay={handlePayInvoice}
+        onSettled={async (status) => {
+          // Auto-send unlock when payment is detected via polling
+          if (!locker) return;
+          const preimage = status.preimage;
+          if (!preimage) return;
+          try {
+            await sendUnlock({
+              recipientPubkey: locker.pubkey,
+              lockerId: locker.dTag,
+              paymentPreimage: preimage,
+              rentalInvoice: currentInvoice,
+            });
+            setMessage('Unlock command sent via NIP-17. Locker should open shortly.');
+          } catch (err: any) {
+            setMessage(err?.message ?? 'Failed to send unlock command');
+          }
+          setRenting(false);
+        }}
       />
     </div>
   );

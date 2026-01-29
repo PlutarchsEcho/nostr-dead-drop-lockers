@@ -10,9 +10,10 @@ interface InvoiceModalProps {
   invoice: string;
   onClose: () => void;
   onPay: () => Promise<string>;
+  onSettled?: (status: any) => Promise<void>;
 }
 
-export function InvoiceModal({ open, invoice, onClose, onPay }: InvoiceModalProps) {
+export function InvoiceModal({ open, invoice, onClose, onPay, onSettled }: InvoiceModalProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -28,11 +29,47 @@ export function InvoiceModal({ open, invoice, onClose, onPay }: InvoiceModalProp
   }, [invoice]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !invoice) return;
     setMessage(null);
-    // If NWC notifications are implemented, we could subscribe here to the chosen wallet's relay
-    // and auto-close when a payment_received notification matching the invoice payment_hash is received.
-  }, [open]);
+
+    // Poll for invoice settlement using lookup_invoice
+    const active = nwc.getActiveConnection();
+    if (!active) return;
+
+    let cancelled = false;
+    const pollInterval = 3000; // 3 seconds
+
+    const poll = async () => {
+      if (cancelled) return;
+      try {
+        const client = new LN(active.connectionString);
+        const status = await client.lookupInvoice(invoice);
+        if (status && status.state === 'settled' && status.preimage) {
+          setMessage('Payment received!');
+          if (onSettled) {
+            await onSettled(status);
+          }
+          setTimeout(() => {
+            if (!cancelled) onClose();
+          }, 1000);
+          return;
+        }
+      } catch (err) {
+        // Ignore lookup errors, keep polling
+      }
+      if (!cancelled) {
+        setTimeout(poll, pollInterval);
+      }
+    };
+
+    // Start polling after a short delay
+    const timeout = setTimeout(poll, pollInterval);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [open, invoice, nwc, onClose, onSettled]);
 
   const handleCopy = async () => {
     try {
