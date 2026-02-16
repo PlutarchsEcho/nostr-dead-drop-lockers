@@ -3,6 +3,8 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { Link } from 'react-router-dom';
 import TopNav from '@/components/TopNav';
 import LockerDetail from './pages/LockerDetail';
+import MarketplaceMain from './pages/MarketplaceMain';
+import SnapshotPublisher from './pages/SnapshotPublisher';
 
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
@@ -18,7 +20,8 @@ export function AppRouter() {
         <TopNav />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/marketplace" element={<MarketplaceMain />} />
+        <Route path="/snapshot" element={<SnapshotPublisher />} />
         <Route path="/dashboard" element={<OwnerDashboard />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/locker/:nip19" element={<LockerDetail />} />
