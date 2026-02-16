@@ -52,6 +52,7 @@
     "embla-carousel-react": "^8.3.0",
     "idb": "^8.0.3",
     "input-otp": "^1.2.4",
+    "jszip": "^3.10.1",
     "latlon-geohash": "^2.0.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.462.0",
