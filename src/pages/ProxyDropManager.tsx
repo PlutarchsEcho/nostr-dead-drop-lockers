@@ -7,38 +7,42 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Shield, Lock, Unlock, Eye, EyeOff, Key, User, 
-  Package, ArrowRight, CheckCircle, AlertTriangle,
-  Copy, RefreshCw
+  Shield, Lock, Unlock, User, Send, Package, 
+  CheckCircle, AlertTriangle, Copy, MessageSquare
 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Link } from 'react-router-dom';
 
 // Mock active proxy drops
 const MOCK_PROXY_DROPS = [
   {
     id: 'proxy-1',
     lockerName: 'Mission District Secure Box',
+    lockerAddress: '2490 Mission St, San Francisco, CA',
     shipperNpub: 'npub1shipper...',
-    proxyNpub: 'npub1lockerowner...', // The locker owner acts as proxy
+    proxyNpub: 'npub1lockerowner...',
+    proxyName: 'Alice (Locker Owner)',
     recipientNpub: 'npub1recipient...',
     itemDescription: 'Hardware wallet package',
     status: 'awaiting_drop', // awaiting_drop, in_locker, picked_up
     createdAt: new Date(Date.now() - 3600000 * 2),
-    proxyCode: null, // Encrypted - only proxy can decrypt
+    lockerCode: null, // Generated on confirm
     recipientCode: null,
   },
   {
     id: 'proxy-2',
     lockerName: 'Capitol Hill Tech Hub',
+    lockerAddress: '123 Pine St, Seattle, WA',
     shipperNpub: 'npub1shipper2...',
-    proxyNpub: 'npub1courier...', // A third-party courier service
+    proxyNpub: 'npub1courier...',
+    proxyName: 'Bob (Courier)',
     recipientNpub: 'npub1recipient2...',
     itemDescription: 'Privacy phone + accessories',
     status: 'in_locker',
     createdAt: new Date(Date.now() - 3600000 * 24),
-    proxyCode: 'encrypted(0x7A8B9C...)', // Encrypted blob only proxy can read
-    recipientCode: 'RECV-X2Y4Z6',
+    lockerCode: '847293', // 6-digit code to open locker
+    recipientCode: 'X2Y4Z6',
   },
 ];
 
@@ -48,10 +52,10 @@ const MOCK_INCOMING = [
     id: 'incoming-1',
     lockerName: 'Brooklyn Heights Drop',
     shipperNpub: 'npub1vendor...',
+    shipperName: 'CryptoVault Store',
     itemDescription: 'ColdCard Mk4',
     status: 'in_locker',
-    proxyCode: 'PROXY-9D2E4F',
-    recipientCode: 'RECV-A1B3C5',
+    recipientCode: 'A1B3C5',
   },
 ];
 
@@ -59,40 +63,41 @@ export default function ProxyDropManager() {
   useSeoMeta({ title: 'Proxy Drops - DeadDropstr' });
   const { toast } = useToast();
   const [drops, setDrops] = useState(MOCK_PROXY_DROPS);
-  const [incoming, setIncoming] = useState(MOCK_INCOMING);
+  const [incoming] = useState(MOCK_INCOMING);
   const [activeTab, setActiveTab] = useState('outgoing');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedDrop, setSelectedDrop] = useState<typeof MOCK_PROXY_DROPS[0] | null>(null);
-  const [showCodeDialog, setShowCodeDialog] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
   
-  // Form state for creating proxy drop
+  // Form state
   const [formData, setFormData] = useState({
     lockerId: '',
     proxyNpub: '',
+    proxyName: '',
     recipientNpub: '',
     itemDescription: '',
   });
 
-  // Generate a proxy drop code
-  const generateProxyDrop = (dropId: string) => {
-    const proxyCode = 'PROXY-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const recipientCode = 'RECV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  // Generate codes when shipper confirms drop
+  const confirmDrop = (dropId: string) => {
+    const lockerCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digits
+    const recipientCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     
     setDrops(drops.map(d => 
       d.id === dropId 
-        ? { ...d, status: 'in_locker' as const, proxyCode, recipientCode }
+        ? { ...d, status: 'in_locker' as const, lockerCode, recipientCode }
         : d
     ));
     
     toast({
-      title: "Proxy Drop Created",
-      description: "Codes generated. Share the recipient code privately.",
+      title: "Drop Confirmed",
+      description: "Codes generated. Message the proxy with the locker code.",
     });
   };
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast({ title: "Code copied to clipboard" });
+    toast({ title: "Code copied" });
   };
 
   return (
@@ -101,14 +106,14 @@ export default function ProxyDropManager() {
         <header className="mb-6">
           <h1 className="text-2xl font-bold">Proxy Drops</h1>
           <p className="text-muted-foreground">
-            Secure escrow system for proxy handoffs
+            Have someone else handle the locker drop for you
           </p>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
-            <TabsTrigger value="outgoing">Outgoing (Shipping)</TabsTrigger>
-            <TabsTrigger value="incoming">Incoming (Receiving)</TabsTrigger>
+            <TabsTrigger value="outgoing">Sending (You're Shipper)</TabsTrigger>
+            <TabsTrigger value="incoming">Receiving</TabsTrigger>
           </TabsList>
 
           <TabsContent value="outgoing" className="space-y-4">
@@ -116,7 +121,7 @@ export default function ProxyDropManager() {
               <h2 className="text-lg font-semibold">Your Proxy Shipments</h2>
               <Button onClick={() => setShowCreateDialog(true)}>
                 <Package className="h-4 w-4 mr-2" />
-                Create Proxy Drop
+                New Proxy Drop
               </Button>
             </div>
 
@@ -136,22 +141,16 @@ export default function ProxyDropManager() {
                         <CardTitle className="text-lg">{drop.lockerName}</CardTitle>
                         <CardDescription>{drop.itemDescription}</CardDescription>
                       </div>
-                      <Badge 
-                        variant={
-                          drop.status === 'awaiting_drop' ? 'outline' :
-                          drop.status === 'in_locker' ? 'default' : 'secondary'
-                        }
-                      >
-                        {drop.status === 'awaiting_drop' ? 'Awaiting Drop' :
-                         drop.status === 'in_locker' ? 'In Locker' : 'Picked Up'}
+                      <Badge variant={drop.status === 'in_locker' ? 'default' : 'outline'}>
+                        {drop.status === 'awaiting_drop' ? 'Awaiting Drop' : 'In Locker'}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Shipper:</span>
-                        <p className="font-mono text-xs">{drop.shipperNpub}</p>
+                        <span className="text-muted-foreground">Proxy:</span>
+                        <p>{drop.proxyName || drop.proxyNpub}</p>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Recipient:</span>
@@ -159,94 +158,80 @@ export default function ProxyDropManager() {
                       </div>
                     </div>
 
-                    {/* Status flow */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        drop.status !== 'awaiting_drop' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        <Package className="h-4 w-4" />
-                      </div>
-                      <div className="h-0.5 w-8 bg-muted" />
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        drop.status === 'in_locker' || drop.status === 'picked_up' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        <Lock className="h-4 w-4" />
-                      </div>
-                      <div className="h-0.5 w-8 bg-muted" />
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        drop.status === 'picked_up' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                      }`}>
-                        <Unlock className="h-4 w-4" />
-                      </div>
-                    </div>
-
                     {drop.status === 'awaiting_drop' && (
-                      <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
+                      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
                         <div className="flex items-start gap-3">
-                          <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />
+                          <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
                           <div>
-                            <p className="font-medium text-orange-900">Action Required</p>
-                            <p className="text-sm text-orange-800">
-                              Ship to the locker address. Once delivered, click "Confirm Drop" 
-                              to generate access codes.
+                            <p className="font-medium text-amber-900">Action Required</p>
+                            <p className="text-sm text-amber-800">
+                              1. Ship package to: <strong>{drop.lockerAddress}</strong>
+                            </p>
+                            <p className="text-sm text-amber-800">
+                              2. Click "Confirm Shipped" to generate codes
+                            </p>
+                            <p className="text-sm text-amber-800">
+                              3. Message the proxy with the locker code
                             </p>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    {drop.status === 'in_locker' && (
+                    {drop.status === 'in_locker' && drop.lockerCode && (
                       <div className="space-y-3">
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                          <p className="font-medium text-green-900 mb-2">Drop Confirmed</p>
+                          <p className="font-medium text-green-900">Package Secured</p>
                           <p className="text-sm text-green-800">
-                            Access authorization encrypted for proxy. 
-                            Only they can decrypt and access the locker.
+                            Share these codes via Nostr DM
                           </p>
                         </div>
                         
-                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Lock className="h-4 w-4 text-amber-600" />
-                            <p className="font-medium text-amber-900">Encrypted for Proxy</p>
-                          </div>
-                          <p className="text-xs text-amber-800 font-mono break-all">
-                            {drop.proxyCode ? 
-                              `encrypted(${drop.proxyCode})` : 
-                              "awaiting_proxy_decryption..."
-                            }
-                          </p>
-                          <p className="text-sm text-amber-800 mt-2">
-                            Only the proxy can decrypt this with their nsec
-                          </p>
-                        </div>
-
-                        {drop.recipientCode && (
-                          <div className="bg-primary/10 p-3 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Recipient Code (share privately)</p>
-                            <div className="flex items-center gap-2">
-                              <code className="font-mono text-sm font-bold">{drop.recipientCode}</code>
-                              <Button size="icon" variant="ghost" className="h-6 w-6"
-                                onClick={() => copyCode(drop.recipientCode!)}>
-                                <Copy className="h-3 w-3" />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-black text-white p-4 rounded-lg text-center">
+                            <p className="text-xs text-white/60 mb-1">Locker Code (send to proxy)</p>
+                            <div className="flex items-center justify-center gap-2">
+                              <p className="font-mono text-2xl tracking-widest">{drop.lockerCode}</p>
+                              <Button size="icon" variant="ghost" className="h-8 w-8 text-white"
+                                onClick={() => copyCode(drop.lockerCode!)}>
+                                <Copy className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
-                        )}
+                          <div className="bg-primary/10 p-4 rounded-lg text-center">
+                            <p className="text-xs text-muted-foreground mb-1">Recipient Code (send to recipient)</p>
+                            <div className="flex items-center justify-center gap-2">
+                              <p className="font-mono text-2xl tracking-widest">{drop.recipientCode}</p>
+                              <Button size="icon" variant="ghost" className="h-8 w-8"
+                                onClick={() => copyCode(drop.recipientCode!)}>
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button className="flex-1" asChild>
+                            <Link to="/messages">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Message Proxy
+                            </Link>
+                          </Button>
+                          <Button variant="outline" className="flex-1" asChild>
+                            <Link to="/messages">
+                              <Send className="h-4 w-4 mr-2" />
+                              Message Recipient
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </CardContent>
                   <CardFooter>
                     {drop.status === 'awaiting_drop' && (
-                      <Button className="w-full" onClick={() => generateProxyDrop(drop.id)}>
+                      <Button className="w-full" onClick={() => confirmDrop(drop.id)}>
                         <CheckCircle className="h-4 w-4 mr-2" />
-                        Confirm Drop (Generate Codes)
-                      </Button>
-                    )}
-                    {drop.status === 'in_locker' && (
-                      <Button variant="outline" className="w-full">
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Mark as Picked Up
+                        Confirm Shipped (Generate Codes)
                       </Button>
                     )}
                   </CardFooter>
@@ -256,7 +241,7 @@ export default function ProxyDropManager() {
           </TabsContent>
 
           <TabsContent value="incoming" className="space-y-4">
-            <h2 className="text-lg font-semibold">Incoming Packages</h2>
+            <h2 className="text-lg font-semibold">Packages for You</h2>
             
             {incoming.length === 0 ? (
               <Card className="border-dashed">
@@ -272,14 +257,14 @@ export default function ProxyDropManager() {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-lg">{pkg.lockerName}</CardTitle>
-                        <CardDescription>{pkg.itemDescription}</CardDescription>
+                        <CardDescription>From: {pkg.shipperName}</CardDescription>
                       </div>
                       <Badge>Ready for Pickup</Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="bg-black text-white p-6 rounded-lg text-center">
-                      <p className="text-xs text-white/60 mb-2">Your Access Code</p>
+                      <p className="text-xs text-white/60 mb-2">Your Pickup Code</p>
                       <p className="font-mono text-3xl tracking-[0.2em]">{pkg.recipientCode}</p>
                     </div>
                     
@@ -289,7 +274,6 @@ export default function ProxyDropManager() {
                         Copy Code
                       </Button>
                       <Button variant="outline" className="flex-1">
-                        <MapPin className="h-4 w-4 mr-2" />
                         Get Directions
                       </Button>
                     </div>
@@ -315,55 +299,45 @@ export default function ProxyDropManager() {
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                   <User className="h-5 w-5 text-primary" />
                 </div>
-                <p className="font-medium">1. Create Drop</p>
+                <p className="font-medium">1. Pick a Proxy</p>
                 <p className="text-sm text-muted-foreground">
-                  Specify locker, recipient, and item
+                  Choose someone to handle the drop (locker owner, friend, courier)
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                   <Package className="h-5 w-5 text-primary" />
                 </div>
-                <p className="font-medium">2. Ship to Locker</p>
+                <p className="font-medium">2. Ship</p>
                 <p className="text-sm text-muted-foreground">
-                  Send item to locker address
+                  Send package to locker address
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <Lock className="h-5 w-5 text-primary" />
+                  <Send className="h-5 w-5 text-primary" />
                 </div>
-                <p className="font-medium">3. Encrypt for Proxy</p>
+                <p className="font-medium">3. Message Proxy</p>
                 <p className="text-sm text-muted-foreground">
-                  Access auth encrypted to proxy's npub
+                  DM them the locker code so they can open it
                 </p>
               </div>
               <div className="space-y-2">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
                   <Unlock className="h-5 w-5 text-primary" />
                 </div>
-                <p className="font-medium">4. Pick Up</p>
+                <p className="font-medium">4. Recipient Picks Up</p>
                 <p className="text-sm text-muted-foreground">
-                  Recipient uses their code to access
+                  They use their code to collect
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 bg-muted p-4 rounded-lg space-y-2">
+            <div className="mt-6 bg-muted p-4 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                <strong>Encrypted Authorization:</strong> When a drop is confirmed, the shipper 
-                encrypts an access authorization using the proxy's public key (npub). This 
-                authorization contains the locker access code and recipient details.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <strong>Proxy Decryption:</strong> Only the proxy can decrypt this message with 
-                their private key (nsec). They then either place the item in the locker themselves 
-                OR forward the access code to the recipient.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                <strong>Flexible Proxy Model:</strong> The proxy can be the locker owner, a 
-                trusted friend, or a paid courier service. The cryptographic binding ensures 
-                only the intended proxy can access the drop authorization.
+                <strong>Simple & Flexible:</strong> No encryption needed - just message your proxy 
+                the locker code via Nostr DM. The proxy can be anyone: the locker owner, a trusted 
+                friend, or a courier service. You control who gets access by who you share the code with.
               </p>
             </div>
           </CardContent>
@@ -376,7 +350,7 @@ export default function ProxyDropManager() {
           <DialogHeader>
             <DialogTitle>Create Proxy Drop</DialogTitle>
             <DialogDescription>
-              Set up a secure proxy handoff through a locker
+              Have someone else handle the locker placement
             </DialogDescription>
           </DialogHeader>
           
@@ -396,19 +370,26 @@ export default function ProxyDropManager() {
             </div>
             
             <div className="space-y-2">
-              <Label>Proxy npub (who will handle the drop)</Label>
-              <Input 
-                placeholder="npub1... (locker owner or courier)"
-                value={formData.proxyNpub}
-                onChange={(e) => setFormData({...formData, proxyNpub: e.target.value})}
-              />
+              <Label>Proxy (who will place item in locker)</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input 
+                  placeholder="Name (e.g., Alice)"
+                  value={formData.proxyName}
+                  onChange={(e) => setFormData({...formData, proxyName: e.target.value})}
+                />
+                <Input 
+                  placeholder="npub1..."
+                  value={formData.proxyNpub}
+                  onChange={(e) => setFormData({...formData, proxyNpub: e.target.value})}
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
-                This can be the locker owner or a trusted third-party courier
+                This can be the locker owner, a friend, or a courier
               </p>
             </div>
             
             <div className="space-y-2">
-              <Label>Recipient npub (final recipient)</Label>
+              <Label>Recipient npub (who will pick up)</Label>
               <Input 
                 placeholder="npub1..."
                 value={formData.recipientNpub}
