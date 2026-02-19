@@ -20,22 +20,24 @@ const MOCK_PROXY_DROPS = [
     id: 'proxy-1',
     lockerName: 'Mission District Secure Box',
     shipperNpub: 'npub1shipper...',
+    proxyNpub: 'npub1lockerowner...', // The locker owner acts as proxy
     recipientNpub: 'npub1recipient...',
     itemDescription: 'Hardware wallet package',
     status: 'awaiting_drop', // awaiting_drop, in_locker, picked_up
     createdAt: new Date(Date.now() - 3600000 * 2),
-    proxyCode: null, // Will be generated when shipper confirms
+    proxyCode: null, // Encrypted - only proxy can decrypt
     recipientCode: null,
   },
   {
     id: 'proxy-2',
     lockerName: 'Capitol Hill Tech Hub',
     shipperNpub: 'npub1shipper2...',
+    proxyNpub: 'npub1courier...', // A third-party courier service
     recipientNpub: 'npub1recipient2...',
     itemDescription: 'Privacy phone + accessories',
     status: 'in_locker',
     createdAt: new Date(Date.now() - 3600000 * 24),
-    proxyCode: 'PROXY-7A8B9C',
+    proxyCode: 'encrypted(0x7A8B9C...)', // Encrypted blob only proxy can read
     recipientCode: 'RECV-X2Y4Z6',
   },
 ];
@@ -66,6 +68,7 @@ export default function ProxyDropManager() {
   // Form state for creating proxy drop
   const [formData, setFormData] = useState({
     lockerId: '',
+    proxyNpub: '',
     recipientNpub: '',
     itemDescription: '',
   });
@@ -192,29 +195,35 @@ export default function ProxyDropManager() {
                       </div>
                     )}
 
-                    {drop.status === 'in_locker' && drop.proxyCode && (
+                    {drop.status === 'in_locker' && (
                       <div className="space-y-3">
                         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                           <p className="font-medium text-green-900 mb-2">Drop Confirmed</p>
                           <p className="text-sm text-green-800">
-                            Item is secured. The proxy can open with their code, 
-                            and the recipient has their own code.
+                            Access authorization encrypted for proxy. 
+                            Only they can decrypt and access the locker.
                           </p>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-muted p-3 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Proxy Code</p>
-                            <div className="flex items-center gap-2">
-                              <code className="font-mono text-sm">{drop.proxyCode}</code>
-                              <Button size="icon" variant="ghost" className="h-6 w-6" 
-                                onClick={() => copyCode(drop.proxyCode!)}>
-                                <Copy className="h-3 w-3" />
-                              </Button>
-                            </div>
+                        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Lock className="h-4 w-4 text-amber-600" />
+                            <p className="font-medium text-amber-900">Encrypted for Proxy</p>
                           </div>
+                          <p className="text-xs text-amber-800 font-mono break-all">
+                            {drop.proxyCode ? 
+                              `encrypted(${drop.proxyCode})` : 
+                              "awaiting_proxy_decryption..."
+                            }
+                          </p>
+                          <p className="text-sm text-amber-800 mt-2">
+                            Only the proxy can decrypt this with their nsec
+                          </p>
+                        </div>
+
+                        {drop.recipientCode && (
                           <div className="bg-primary/10 p-3 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Recipient Code</p>
+                            <p className="text-xs text-muted-foreground mb-1">Recipient Code (share privately)</p>
                             <div className="flex items-center gap-2">
                               <code className="font-mono text-sm font-bold">{drop.recipientCode}</code>
                               <Button size="icon" variant="ghost" className="h-6 w-6"
@@ -223,7 +232,7 @@ export default function ProxyDropManager() {
                               </Button>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     )}
                   </CardContent>
@@ -322,11 +331,11 @@ export default function ProxyDropManager() {
               </div>
               <div className="space-y-2">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                  <Key className="h-5 w-5 text-primary" />
+                  <Lock className="h-5 w-5 text-primary" />
                 </div>
-                <p className="font-medium">3. Generate Codes</p>
+                <p className="font-medium">3. Encrypt for Proxy</p>
                 <p className="text-sm text-muted-foreground">
-                  Two codes: one for proxy, one for recipient
+                  Access auth encrypted to proxy's npub
                 </p>
               </div>
               <div className="space-y-2">
@@ -340,12 +349,21 @@ export default function ProxyDropManager() {
               </div>
             </div>
 
-            <div className="mt-6 bg-muted p-4 rounded-lg">
+            <div className="mt-6 bg-muted p-4 rounded-lg space-y-2">
               <p className="text-sm text-muted-foreground">
-                <strong>Cryptographic Security:</strong> Each code is derived from the locker owner's 
-                nsec + the drop ID + recipient npub. Only the proxy (with their nsec) and the 
-                intended recipient (with their private key) can derive valid access codes. 
-                The locker validates these cryptographically before opening.
+                <strong>Encrypted Authorization:</strong> When a drop is confirmed, the shipper 
+                encrypts an access authorization using the proxy's public key (npub). This 
+                authorization contains the locker access code and recipient details.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <strong>Proxy Decryption:</strong> Only the proxy can decrypt this message with 
+                their private key (nsec). They then either place the item in the locker themselves 
+                OR forward the access code to the recipient.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <strong>Flexible Proxy Model:</strong> The proxy can be the locker owner, a 
+                trusted friend, or a paid courier service. The cryptographic binding ensures 
+                only the intended proxy can access the drop authorization.
               </p>
             </div>
           </CardContent>
@@ -378,7 +396,19 @@ export default function ProxyDropManager() {
             </div>
             
             <div className="space-y-2">
-              <Label>Recipient npub</Label>
+              <Label>Proxy npub (who will handle the drop)</Label>
+              <Input 
+                placeholder="npub1... (locker owner or courier)"
+                value={formData.proxyNpub}
+                onChange={(e) => setFormData({...formData, proxyNpub: e.target.value})}
+              />
+              <p className="text-xs text-muted-foreground">
+                This can be the locker owner or a trusted third-party courier
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Recipient npub (final recipient)</Label>
               <Input 
                 placeholder="npub1..."
                 value={formData.recipientNpub}
