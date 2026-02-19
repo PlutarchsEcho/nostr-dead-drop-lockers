@@ -63,9 +63,24 @@ Users can:
 
 ### Software Stack
 - **Firmware:** C++ (Arduino/PlatformIO)
-- **Marketplace:** React + TypeScript + Nostr (kind 30402 events)
+- **Marketplace:** React + TypeScript served via Nostr (nip-94/95)
+- **Frontend:** Decentralized - no web hosting needed, served from Nostr relays
 - **Payments:** Lightning invoices + BTCPay/LNDhub
 - **Sync:** Nostr relay communication (offline-capable)
+
+### Why Decentralized Frontend Matters
+Traditional web apps require:
+- Centralized hosting (censorship risk)
+- DNS registration (seizable)
+- Server costs (ongoing expense)
+
+DeadDropstr removes these:
+- Frontend distributed across Nostr relays
+- Users access via any relay, no single point of failure
+- No hosting bills, no takedown risk
+- True "uncensorable" marketplace
+
+This is critical for a privacy-focused physical exchange network.
 
 ### Security Model
 - Codes validated locally (SHA256 + salt + expiry)
@@ -115,12 +130,18 @@ Users can:
 
 | Category | Amount | Purpose |
 |----------|--------|---------|
-| Hardware R&D | $15,000 | Component testing, PCB design, 50 dev kits |
-| Firmware Development | $20,000 | 12 months dev time (part-time) |
-| Documentation | $5,000 | Video tutorials, build guides, workshops |
-| Test Deployments | $5,000 | Ship kits to 20+ test locations globally |
-| Infrastructure | $5,000 | Relays, domains, hosting for 2 years |
+| **Hardware Distribution** | $30,000 | Manufacture & ship 100 starter kits to global test sites |
+| **Community Bootcamp** | $10,000 | Workshops, documentation, builder support |
+| **Field Testing** | $5,000 | Travel to deploy sites, gather feedback, iterate |
+| **Infrastructure** | $3,000 | Relays, domains, hosting for 18 months |
+| **Contingency** | $2,000 | Unexpected costs, replacement parts |
 | **Total** | **$50,000** | |
+
+**Why this allocation:**
+- Development is volunteer-driven (open source ethos)
+- Network effect requires *physical presence* in many locations
+- 100 deployed lockers creates real usage data and case studies
+- Community workshops convert builders into evangelists
 
 ---
 
@@ -130,7 +151,8 @@ Users can:
 2. **Proven Track Record:** [If you have prior FOSS contributions, mention them]
 3. **Pure FOSS:** No platform fees. Locker owners keep 100% of revenue. We charge nothing.
 4. **No Vendor Lock-in:** Pure FOSS, no proprietary hardware or services
-5. **Sustainable:** Grant funds development only; protocol remains free forever
+5. **Sustainable:** Grant funds network bootstrap; protocol remains free forever
+6. **Decentralized:** No single point of failure - not even for the website
 
 ---
 
