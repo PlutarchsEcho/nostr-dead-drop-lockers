@@ -560,47 +560,38 @@ export default function MarketplaceMain() {
   );
 }
 
-// Partner e-commerce sites
-const PARTNER_SITES = [
+// Local/peer sellers for circular economy
+const LOCAL_SELLERS = [
   {
-    name: 'PrivacyTools.io',
-    url: 'https://www.privacytools.io',
-    description: 'Privacy-focused software and hardware recommendations',
-    category: 'Privacy Tools',
+    id: 'local-1',
+    name: 'CryptoMike',
+    npub: 'npub1mike...',
+    location: 'Near You',
+    items: ['Hardware wallets', 'Faraday bags', 'Used mining rigs'],
+    trustScore: 4.8,
+    sales: 23,
   },
   {
-    name: 'CoinKite',
-    url: 'https://coldcard.com',
-    description: 'Bitcoin hardware wallets and security devices',
-    category: 'Bitcoin',
+    id: 'local-2',
+    name: 'PrivacyPam',
+    npub: 'npub1pam...',
+    location: 'Nearby',
+    items: ['De-googled phones', 'Privacy accessories', 'Books'],
+    trustScore: 4.9,
+    sales: 47,
   },
   {
-    name: 'Purism',
-    url: 'https://puri.sm',
-    description: 'Privacy-respecting laptops and phones',
-    category: 'Electronics',
-  },
-  {
-    name: 'Silent Pocket',
-    url: 'https://silentpocket.com',
-    description: 'Faraday bags and signal blocking accessories',
-    category: 'Accessories',
-  },
-  {
-    name: 'Privacy Pros',
-    url: 'https://privacypros.io',
-    description: 'Billfodl and crypto security products',
-    category: 'Bitcoin',
-  },
-  {
-    name: 'Decentralized Web',
-    url: 'https://getdweb.net',
-    description: 'Decentralized web hosting and services',
-    category: 'Services',
+    id: 'local-3',
+    name: 'BitcoinBill',
+    npub: 'npub1bill...',
+    location: 'Local',
+    items: ['Sats for cash', 'Cold storage setup', 'Node help'],
+    trustScore: 5.0,
+    sales: 12,
   },
 ];
 
-// No lockers in area component - shows partner sites instead
+// No lockers in area component - shows local peer sellers
 function NoLockersInArea({ location, onClear }: { location: string; onClear: () => void }) {
   return (
     <div className="space-y-8">
@@ -614,44 +605,88 @@ function NoLockersInArea({ location, onClear }: { location: string; onClear: () 
             <div>
               <h3 className="text-lg font-bold mb-1">No Lockers in {location}</h3>
               <p className="text-muted-foreground">
-                DeadDropstr lockers aren't available in your area yet. 
-                Check out these partner sites that ship directly while we expand.
+                Keep it local. These sellers in your area offer meetup or direct shipping. 
+                No lockers needed for peer-to-peer trades.
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Partner sites grid */}
+      {/* Local sellers grid */}
       <div>
-        <h3 className="text-xl font-bold mb-4">Featured Partner Stores</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-bold">Local Sellers Near You</h3>
+          <Badge variant="outline">P2P Circular Economy</Badge>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {PARTNER_SITES.map((partner) => (
-            <Card key={partner.name} className="hover:border-primary transition-colors group">
+          {LOCAL_SELLERS.map((seller) => (
+            <Card key={seller.id} className="hover:border-primary transition-colors group">
               <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                    {partner.name}
-                  </CardTitle>
-                  <Badge variant="secondary">{partner.category}</Badge>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Store className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base group-hover:text-primary transition-colors">
+                      {seller.name}
+                    </CardTitle>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>★ {seller.trustScore}</span>
+                      <span>•</span>
+                      <span>{seller.sales} sales</span>
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  {partner.description}
-                </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => window.open(partner.url, '_blank')}
-                >
-                  Visit Store →
-                </Button>
+                <div>
+                  <p className="text-sm text-muted-foreground">Sells:</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {seller.items.map(item => (
+                      <Badge key={item} variant="secondary" className="text-xs">{item}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => alert(`Message ${seller.name} via Nostr DM`)}
+                  >
+                    Message
+                  </Button>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => alert(`View ${seller.name}'s listings`)}
+                  >
+                    View Listings
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
+
+      {/* Premium placement CTA */}
+      <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-bold text-lg">Want premium placement here?</h4>
+              <p className="text-muted-foreground text-sm">
+                List your items for just 10k sats/month. Be the first seller people see in your area.
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/dashboard">
+                Become a Featured Seller
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Alternative actions */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t">
