@@ -397,7 +397,14 @@ export default function MarketplaceMain() {
             <div className="space-y-3 max-h-[600px] overflow-y-auto">
               <h3 className="font-semibold text-lg">Available Products</h3>
               {filteredProducts.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No products match your filters</p>
+                locationSearch && !locationGeohashes ? (
+                  <NoLockersInArea 
+                    location={locationSearch} 
+                    onClear={() => setLocationSearch('')}
+                  />
+                ) : (
+                  <p className="text-muted-foreground text-sm">No products match your filters</p>
+                )
               ) : (
                 filteredProducts.map(product => (
                   <Card key={product.id} className="hover:border-primary transition-colors cursor-pointer">
@@ -423,6 +430,12 @@ export default function MarketplaceMain() {
               )}
             </div>
           </div>
+        ) : locationSearch && !locationGeohashes ? (
+          // No lockers in searched area
+          <NoLockersInArea 
+            location={locationSearch} 
+            onClear={() => setLocationSearch('')}
+          />
         ) : filteredProducts.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent>
@@ -544,6 +557,56 @@ export default function MarketplaceMain() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+// No lockers in area component
+function NoLockersInArea({ location, onClear }: { location: string; onClear: () => void }) {
+  return (
+    <Card className="text-center py-12 max-w-2xl mx-auto">
+      <CardContent className="space-y-6">
+        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
+          <MapPin className="h-10 w-10 text-muted-foreground" />
+        </div>
+        
+        <div>
+          <h3 className="text-2xl font-bold mb-2">No Lockers in {location}</h3>
+          <p className="text-muted-foreground text-lg">
+            Products on DeadDropstr ship to secure lockers for anonymous pickup.
+          </p>
+        </div>
+
+        <div className="bg-muted p-4 rounded-lg text-left">
+          <p className="font-medium mb-2">Why no results?</p>
+          <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+            <li>There are no lockers near {location} yet</li>
+            <li>Vendors can only ship to locations with active lockers</li>
+            <li>As a locker provider, you'd enable commerce in your area</li>
+          </ul>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button asChild>
+            <Link to="/dashboard">
+              <Plus className="h-4 w-4 mr-2" />
+              Become a Locker Provider
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={onClear}>
+            Clear Search
+          </Button>
+        </div>
+
+        <div className="text-sm text-muted-foreground pt-4 border-t">
+          <p className="font-medium mb-2">What is a locker provider?</p>
+          <p>
+            Set up a secure drop box at your location. Buyers' orders ship to you, 
+            you place them in the locker, and buyers pick up with a digital code. 
+            Earn fees for each transaction.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
