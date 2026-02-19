@@ -9,6 +9,7 @@ export default defineConfig(() => ({
     host: "::",
     port: 8080,
   },
+  base: '/nostr-dead-drop-lockers/',
   plugins: [
     react(),
   ],
