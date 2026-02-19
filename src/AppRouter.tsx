@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import TopNav from '@/components/TopNav';
 import LockerDetail from './pages/LockerDetail';
 import MarketplaceMain from './pages/MarketplaceMain';
+import ProductDetail from './pages/ProductDetail';
 import SnapshotPublisher from './pages/SnapshotPublisher';
 
 import Index from "./pages/Index";
@@ -21,6 +22,7 @@ export function AppRouter() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/marketplace" element={<MarketplaceMain />} />
+        <Route path="/product/:dTag" element={<ProductDetail />} />
         <Route path="/snapshot" element={<SnapshotPublisher />} />
         <Route path="/dashboard" element={<OwnerDashboard />} />
         <Route path="/messages" element={<Messages />} />

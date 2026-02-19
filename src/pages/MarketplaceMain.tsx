@@ -5,129 +5,125 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { List, Filter, MapPin, DollarSign, Box, Map as MapIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Search, Filter, ShoppingBag, Store, Plus } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LockersMap } from '@/components/LockersMap';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 
-// Simple locker type
-interface LockerListing {
+// Product type
+interface Product {
   id: string;
   dTag: string;
   title: string;
   description: string;
   price: number;
-  geohash: string;
-  dimensions?: string;
-  status: 'available' | 'occupied' | 'maintenance';
-  owner: string;
+  category: string;
+  vendor: string;
+  vendorNpub: string;
+  image?: string;
+  inStock: boolean;
 }
 
-function parseLockerEvent(event: any): LockerListing | null {
-  try {
-    const tags = new Map(event.tags);
-    return {
-      id: event.id,
-      dTag: tags.get('d') || '',
-      title: tags.get('title') || 'Unnamed Locker',
-      description: event.content || '',
-      price: parseInt(tags.get('price') || '0'),
-      geohash: tags.get('g') || '',
-      dimensions: tags.get('dimensions'),
-      status: (tags.get('status') as any) || 'available',
-      owner: event.pubkey,
-    };
-  } catch {
-    return null;
-  }
-}
-
-// Mock data for demo since relays may be empty
-const MOCK_LOCKERS: LockerListing[] = [
+// Mock products for demo
+const MOCK_PRODUCTS: Product[] = [
   {
     id: '1',
-    dTag: 'locker-001',
-    title: 'Downtown Secure Box',
-    description: '24/7 accessible locker in well-lit area. Perfect for small packages.',
-    price: 500,
-    geohash: '9q8yyz',
-    dimensions: '30x40x50 cm',
-    status: 'available',
-    owner: 'npub1abc...',
+    dTag: 'prod-001',
+    title: 'Privacy-First Smartphone',
+    description: 'De-googled Android phone with GrapheneOS pre-installed. Full privacy setup.',
+    price: 899000,
+    category: 'Electronics',
+    vendor: 'PrivacyTech Co',
+    vendorNpub: 'npub1abc...',
+    inStock: true,
   },
   {
     id: '2',
-    dTag: 'locker-002',
-    title: 'University Campus Drop',
-    description: 'Near student center. High traffic, very secure.',
-    price: 300,
-    geohash: '9q8yym',
-    dimensions: '25x35x45 cm',
-    status: 'available',
-    owner: 'npub1def...',
+    dTag: 'prod-002',
+    title: 'Faraday Phone Pouch',
+    description: 'Military-grade signal blocking pouch. Protects against tracking and surveillance.',
+    price: 45000,
+    category: 'Accessories',
+    vendor: 'SignalSafe',
+    vendorNpub: 'npub1def...',
+    inStock: true,
   },
   {
     id: '3',
-    dTag: 'locker-003',
-    title: 'Shopping Mall Locker',
-    description: 'Inside mall, security cameras. Good for retail exchanges.',
-    price: 750,
-    geohash: '9q8yyk',
-    dimensions: '40x50x60 cm',
-    status: 'occupied',
-    owner: 'npub1ghi...',
+    dTag: 'prod-003',
+    title: 'Cold Card Hardware Wallet',
+    description: 'Ultra-secure Bitcoin hardware wallet. Air-gapped signing.',
+    price: 147000,
+    category: 'Bitcoin',
+    vendor: 'CoinKite',
+    vendorNpub: 'npub1ghi...',
+    inStock: true,
   },
   {
     id: '4',
-    dTag: 'locker-004',
-    title: 'Suburban Community Box',
-    description: 'Residential area, quiet neighborhood. Great for privacy.',
-    price: 250,
-    geohash: '9q8yyf',
-    dimensions: '30x40x40 cm',
-    status: 'available',
-    owner: 'npub1jkl...',
+    dTag: 'prod-004',
+    title: 'Anonymous SIM Card',
+    description: 'Pre-paid SIM, no ID required. Activated and ready to use.',
+    price: 25000,
+    category: 'Communications',
+    vendor: 'GhostConnect',
+    vendorNpub: 'npub1jkl...',
+    inStock: false,
   },
   {
     id: '5',
-    dTag: 'locker-005',
-    title: 'Seattle Tech Hub',
-    description: 'Near major tech campuses. Secure building access.',
-    price: 600,
-    geohash: 'dpwh',
-    dimensions: '35x45x55 cm',
-    status: 'available',
-    owner: 'npub1mno...',
+    dTag: 'prod-005',
+    title: 'Encrypted USB Drive',
+    description: 'Hardware-encrypted USB 3.0. Military-grade AES-256.',
+    price: 89000,
+    category: 'Storage',
+    vendor: 'SecureData',
+    vendorNpub: 'npub1mno...',
+    inStock: true,
   },
   {
     id: '6',
-    dTag: 'locker-006',
-    title: 'Denver Outdoor Spot',
-    description: 'Weatherproof locker near hiking trails. Great for gear exchange.',
-    price: 400,
-    geohash: 'dqcjq',
-    dimensions: '50x60x80 cm',
-    status: 'maintenance',
-    owner: 'npub1pqr...',
+    dTag: 'prod-006',
+    title: 'Privacy Screen Protector',
+    description: '4-way privacy filter. Blocks side-angle viewing.',
+    price: 15000,
+    category: 'Accessories',
+    vendor: 'PrivacyTech Co',
+    vendorNpub: 'npub1abc...',
+    inStock: true,
   },
 ];
 
+const CATEGORIES = ['All', 'Electronics', 'Accessories', 'Bitcoin', 'Communications', 'Storage'];
+
 export default function MarketplaceMain() {
   const { nostr } = useNostr();
-  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
-  const [maxPrice, setMaxPrice] = useState<number>(10000);
+  const [maxPrice, setMaxPrice] = useState<number>(1000000);
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [vendorDialogOpen, setVendorDialogOpen] = useState(false);
 
-  // Query real lockers from Nostr
-  const { data: realLockers, isLoading } = useQuery({
-    queryKey: ['locker-listings'],
+  // Query real products from Nostr
+  const { data: realProducts, isLoading } = useQuery({
+    queryKey: ['products'],
     queryFn: async () => {
       try {
-        const events = await nostr.query([{ kinds: [30402], '#t': ['locker'], limit: 200 }]);
-        return events.map(parseLockerEvent).filter(Boolean) as LockerListing[];
+        const events = await nostr.query([{ kinds: [30402], '#t': ['product'], limit: 200 }]);
+        // Parse events into products
+        return events.map((e: any) => ({
+          id: e.id,
+          dTag: e.tags.find((t: any) => t[0] === 'd')?.[1] || '',
+          title: e.tags.find((t: any) => t[0] === 'title')?.[1] || 'Unnamed Product',
+          description: e.content || '',
+          price: parseInt(e.tags.find((t: any) => t[0] === 'price')?.[1] || '0'),
+          category: e.tags.find((t: any) => t[0] === 'category')?.[1] || 'Other',
+          vendor: e.tags.find((t: any) => t[0] === 'vendor')?.[1] || 'Unknown',
+          vendorNpub: e.pubkey,
+          inStock: e.tags.find((t: any) => t[0] === 'stock')?.[1] !== '0',
+        })) as Product[];
       } catch {
         return [];
       }
@@ -135,20 +131,21 @@ export default function MarketplaceMain() {
     staleTime: 60_000,
   });
 
-  // Use real lockers if available, otherwise mock data
-  const lockers = realLockers?.length ? realLockers : MOCK_LOCKERS;
+  const products = realProducts?.length ? realProducts : MOCK_PRODUCTS;
 
-  const filteredLockers = useMemo(() => {
-    return lockers.filter(locker => {
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
       const matchesSearch = !searchTerm || 
-        locker.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        locker.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesPrice = locker.price <= maxPrice;
-      return matchesSearch && matchesPrice;
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesPrice = product.price <= maxPrice;
+      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+      return matchesSearch && matchesPrice && matchesCategory;
     });
-  }, [lockers, searchTerm, maxPrice]);
+  }, [products, searchTerm, maxPrice, selectedCategory]);
 
   const formatPrice = (sats: number) => {
+    if (sats >= 100000000) return `₿ ${(sats / 100000000).toFixed(3)}`;
     if (sats >= 1000000) return `${(sats / 1000000).toFixed(2)}M sats`;
     if (sats >= 1000) return `${(sats / 1000).toFixed(1)}k sats`;
     return `${sats} sats`;
@@ -162,54 +159,79 @@ export default function MarketplaceMain() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-3xl font-bold">Marketplace</h1>
-              <p className="text-muted-foreground">Find dead drop lockers across North America</p>
+              <p className="text-muted-foreground">Products shipped to dead drop lockers</p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant={viewMode === 'map' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('map')}
-              >
-                <MapIcon className="h-4 w-4 mr-2" />
-                Map
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                <List className="h-4 w-4 mr-2" />
-                List
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filters
+              <Dialog open={vendorDialogOpen} onOpenChange={setVendorDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline">
+                    <Store className="h-4 w-4 mr-2" />
+                    Become a Vendor
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Become a Vendor</DialogTitle>
+                    <DialogDescription>
+                      Sell products that ship to DeadDropstr lockers
+                    </DialogDescription>
+                  </DialogHeader>
+                  <VendorOnboardingForm onComplete={() => setVendorDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+              <Button asChild>
+                <Link to="/dashboard">
+                  <Plus className="h-4 w-4 mr-2" />
+                  List Product
+                </Link>
               </Button>
             </div>
           </div>
 
-          {/* Filters */}
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+          </div>
+
+          {/* Category pills */}
+          <div className="flex gap-2 flex-wrap">
+            {CATEGORIES.map(cat => (
+              <Button
+                key={cat}
+                variant={selectedCategory === cat ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+
+          {/* Expanded filters */}
           {showFilters && (
             <Card>
-              <CardContent className="pt-6 grid gap-6 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Search</Label>
-                  <Input
-                    placeholder="Search by name or description..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
+              <CardContent className="pt-6">
                 <div className="space-y-2">
                   <Label>Max Price: {formatPrice(maxPrice)}</Label>
                   <Slider
                     min={0}
-                    max={50000}
-                    step={500}
+                    max={10000000}
+                    step={10000}
                     value={[maxPrice]}
                     onValueChange={([v]) => setMaxPrice(v)}
                   />
@@ -221,106 +243,144 @@ export default function MarketplaceMain() {
 
         {/* Results count */}
         <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-          <List className="h-4 w-4" />
-          {filteredLockers.length} locker{filteredLockers.length !== 1 ? 's' : ''} found
+          <ShoppingBag className="h-4 w-4" />
+          {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
         </div>
 
-        {/* Content */}
+        {/* Product grid */}
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
               <Card key={i}>
+                <Skeleton className="h-48 w-full" />
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
                 </CardHeader>
-                <CardContent className="space-y-2">
+                <CardContent>
                   <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
                 </CardContent>
               </Card>
             ))}
           </div>
-        ) : viewMode === 'map' ? (
-          <div className="grid lg:grid-cols-3 gap-4">
-            {/* Map */}
-            <Card className="lg:col-span-2 min-h-[500px]">
-              <LockersMap lockers={filteredLockers} />
-            </Card>
-            {/* Sidebar list */}
-            <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {filteredLockers.map(locker => (
-                <Card key={locker.id} className="hover:border-primary transition-colors cursor-pointer">
-                  <CardContent className="p-3">
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-medium text-sm">{locker.title}</h3>
-                      <Badge variant={locker.status === 'available' ? 'default' : 'secondary'} className="text-xs">
-                        {locker.status}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                      {locker.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{formatPrice(locker.price)}/hr</span>
-                      <Button asChild size="sm" variant="ghost">
-                        <Link to={`/locker/${locker.dTag}`}>View</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+        ) : filteredProducts.length === 0 ? (
+          <Card className="text-center py-12">
+            <CardContent>
+              <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-medium mb-2">No products found</h3>
+              <p className="text-muted-foreground">Try adjusting your filters or search terms</p>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredLockers.map(locker => (
-              <Card key={locker.id} className="hover:border-primary transition-colors group">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                      {locker.title}
-                    </CardTitle>
-                    <Badge variant={locker.status === 'available' ? 'default' : 'secondary'}>
-                      {locker.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {locker.description}
-                  </p>
-                  
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1 text-muted-foreground">
-                      <DollarSign className="h-4 w-4" />
-                      <span className="font-medium text-foreground">{formatPrice(locker.price)}</span>
-                      <span className="text-xs">/hr</span>
-                    </div>
-                    {locker.dimensions && (
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        <Box className="h-4 w-4" />
-                        <span>{locker.dimensions}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {locker.geohash && (
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      <span className="font-mono">{locker.geohash}</span>
-                    </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredProducts.map(product => (
+              <Card key={product.id} className="hover:border-primary transition-colors group flex flex-col">
+                {/* Product image placeholder */}
+                <div className="aspect-square bg-muted flex items-center justify-center">
+                  {product.image ? (
+                    <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <ShoppingBag className="h-16 w-16 text-muted-foreground" />
                   )}
+                </div>
+                
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-base group-hover:text-primary transition-colors line-clamp-2">
+                      {product.title}
+                    </CardTitle>
+                  </div>
+                  <Badge variant="secondary" className="w-fit text-xs">
+                    {product.category}
+                  </Badge>
+                </CardHeader>
+                
+                <CardContent className="flex-1">
+                  <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Store className="h-3 w-3" />
+                    <span className="truncate">{product.vendor}</span>
+                  </div>
+                </CardContent>
 
-                  <Button asChild className="w-full mt-2">
-                    <Link to={`/locker/${locker.dTag}`}>
-                      View Details
+                <CardFooter className="pt-0 flex items-center justify-between">
+                  <span className="text-lg font-bold">{formatPrice(product.price)}</span>
+                  <Button asChild size="sm" disabled={!product.inStock}>
+                    <Link to={`/product/${product.dTag}`}>
+                      {product.inStock ? 'Buy Now' : 'Out of Stock'}
                     </Link>
                   </Button>
-                </CardContent>
+                </CardFooter>
               </Card>
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// Vendor onboarding form component
+function VendorOnboardingForm({ onComplete }: { onComplete: () => void }) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    storeName: '',
+    description: '',
+    contact: '',
+  });
+
+  const handleSubmit = () => {
+    // TODO: Publish vendor profile to Nostr
+    console.log('Vendor registration:', formData);
+    onComplete();
+  };
+
+  return (
+    <div className="space-y-6">
+      {step === 1 && (
+        <>
+          <div className="space-y-2">
+            <Label>Store Name</Label>
+            <Input
+              placeholder="Your store name"
+              value={formData.storeName}
+              onChange={e => setFormData({ ...formData, storeName: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Input
+              placeholder="What do you sell?"
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Contact (Nostr DM or Email)</Label>
+            <Input
+              placeholder="How buyers can reach you"
+              value={formData.contact}
+              onChange={e => setFormData({ ...formData, contact: e.target.value })}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSubmit} className="flex-1">
+              Register as Vendor
+            </Button>
+          </div>
+        </>
+      )}
+      
+      <div className="text-sm text-muted-foreground">
+        <p className="font-medium mb-2">How it works:</p>
+        <ol className="list-decimal list-inside space-y-1">
+          <li>Register your store profile</li>
+          <li>List products with prices in sats</li>
+          <li>When someone buys, you'll receive their chosen locker location</li>
+          <li>Ship the product to that locker</li>
+          <li>Buyer gets notified and picks up with a code</li>
+        </ol>
       </div>
     </div>
   );
