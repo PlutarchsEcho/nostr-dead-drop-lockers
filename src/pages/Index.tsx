@@ -2,7 +2,7 @@ import { useSeoMeta } from '@unhead/react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map, Settings, MessageSquare, Zap } from 'lucide-react';
+import { Map, Settings, MessageSquare, Zap, Cpu, Download, Package, Wrench } from 'lucide-react';
 
 export default function Index() {
   useSeoMeta({
@@ -94,20 +94,109 @@ export default function Index() {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <Card className="max-w-2xl mx-auto bg-primary/5 border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-2xl">Ready to Deploy a Locker?</CardTitle>
-            <CardDescription>
-              Flash our ESP32 template onto your hardware, configure via the dashboard, and start earning sats.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild size="lg">
-              <Link to="/dashboard">Get Started</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Ready to Deploy a Locker?</h2>
+        
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Open Hardware Standard */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <Cpu className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Open Hardware Standard</CardTitle>
+              <CardDescription>
+                Fully documented, hackable, and extensible
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Our reference design uses off-the-shelf components: ESP32-S3, secure element, 
+                4G/WiFi module, and standard electronic locks. Fully open source firmware.
+              </p>
+              <ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">
+                <li>Nostr-native event processing</li>
+                <li>Offline-capable code validation</li>
+                <li>Signed access logs</li>
+                <li>Battery backup & tamper detection</li>
+              </ul>
+              <Button variant="outline" className="w-full" onClick={() => window.open('https://github.com/PlutarchsEcho/deaddrop-hardware', '_blank')}>
+                <Download className="mr-2 h-4 w-4" />
+                View Specs
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Ready-to-Go Kits */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <Package className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>DIY Kits</CardTitle>
+              <CardDescription>
+                Everything you need to build your own
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Pre-sourced component kits with step-by-step assembly guides. 
+                Just add your own lockbox or enclosure.
+              </p>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Basic Kit</span>
+                  <span className="font-medium">~$85</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Pro Kit (4G + Secure Element)</span>
+                  <span className="font-medium">~$150</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Complete Enclosure</span>
+                  <span className="font-medium">~$200-500</span>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full">
+                <Package className="mr-2 h-4 w-4" />
+                Browse Kits
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Free Plans */}
+          <Card className="bg-primary/5 border-primary/20">
+            <CardHeader>
+              <Wrench className="h-10 w-10 text-primary mb-2" />
+              <CardTitle>Build Your Own</CardTitle>
+              <CardDescription>
+                Free plans and BOMs
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Download complete schematics, PCB layouts, 3D printable enclosures, 
+                and firmware. Source your own parts anywhere in the world.
+              </p>
+              <ul className="text-sm space-y-1 text-muted-foreground list-disc list-inside">
+                <li>Gerber files & PCB designs</li>
+                <li>3D printable STL files</li>
+                <li>Bill of Materials (BOM)</li>
+                <li>Assembly instructions</li>
+                <li>Firmware source code</li>
+              </ul>
+              <Button className="w-full" onClick={() => window.open('https://github.com/PlutarchsEcho/deaddrop-hardware/releases', '_blank')}>
+                <Download className="mr-2 h-4 w-4" />
+                Download Plans
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="text-center mt-12">
+          <Button asChild size="lg">
+            <Link to="/dashboard">
+              <Settings className="mr-2 h-5 w-5" />
+              Configure Your Locker
+            </Link>
+          </Button>
+        </div>
       </section>
 
       {/* Footer */}

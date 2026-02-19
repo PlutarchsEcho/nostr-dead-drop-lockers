@@ -16,7 +16,7 @@ import useMyLockers from '@/hooks/useMyLockers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Shield, Zap } from 'lucide-react';
+import { Shield, Zap, Cpu, Package, Download } from 'lucide-react';
 
 export default function OwnerDashboard() {
   useSeoMeta({ title: 'Owner Dashboard - Dead Drop Network' });
@@ -147,6 +147,38 @@ export default function OwnerDashboard() {
                 </Card>
               )}
             </section>
+
+            {/* Hardware Requirements Card */}
+            <Card className="bg-muted/50 border-dashed">
+              <CardHeader>
+                <CardTitle className="text-base">Don't Have Hardware Yet?</CardTitle>
+                <CardDescription>
+                  You'll need a Nostr-compatible smart locker to complete setup
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  DeadDropstr lockers run on open hardware. Choose your path:
+                </p>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <Button variant="outline" size="sm" className="h-auto py-2" onClick={() => window.open('https://github.com/PlutarchsEcho/deaddrop-hardware', '_blank')}>
+                    <Cpu className="mr-2 h-4 w-4" />
+                    View Open Specs
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-auto py-2">
+                    <Package className="mr-2 h-4 w-4" />
+                    Order DIY Kit
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-auto py-2" onClick={() => window.open('https://github.com/PlutarchsEcho/deaddrop-hardware/releases', '_blank')}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Plans
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Estimated build cost: $85-250 depending on features (4G, secure element, enclosure)
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Create Locker Form */}
             <Card>
