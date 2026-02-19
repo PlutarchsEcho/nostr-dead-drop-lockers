@@ -2,12 +2,11 @@ import { useSeoMeta } from '@unhead/react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LoginArea } from '@/components/auth/LoginArea';
 import { Map, Settings, MessageSquare, Zap } from 'lucide-react';
 
 export default function Index() {
   useSeoMeta({
-    title: 'Dead Drop Network - Nostr-Native Smart Lockers',
+    title: 'DeadDropstr - Nostr-Native Smart Lockers',
     description: 'A decentralized marketplace for autonomous physical lockers powered by Nostr and Lightning.',
   });
 
@@ -16,10 +15,6 @@ export default function Index() {
       {/* Hero Section */}
       <header className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_40%_at_50%_60%,hsl(var(--primary)/0.12),transparent)]" />
-        <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <span className="text-xl font-bold tracking-tight">DeadDrop</span>
-          <LoginArea className="max-w-60" />
-        </nav>
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-6">
             The <span className="text-primary">Nostr-Native</span> Dead Drop Network

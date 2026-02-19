@@ -13,7 +13,7 @@ export default function TopNav() {
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link to="/" className="text-xl font-bold tracking-tight">
-            DeadDrop
+            DeadDropstr
           </Link>
           <div className="hidden md:flex items-center gap-1">
             <Button
