@@ -98,37 +98,70 @@ export default function StarterPack() {
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <Cpu className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">ESP32-C3 ($3)</p>
                     <p className="text-sm text-muted-foreground">Single-core, WiFi/BLE, 4MB flash</p>
+                    <a 
+                      href="https://www.amazon.com/s?k=esp32-c3-devkit" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Amazon →
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Radio className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">NFC Reader PN532 ($3)</p>
                     <p className="text-sm text-muted-foreground">Only input method. No keypad.</p>
+                    <a 
+                      href="https://www.amazon.com/s?k=pn532+nfc+module" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Amazon →
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">Relay Module ($3)</p>
                     <p className="text-sm text-muted-foreground">Direct lock control. No RS-485 bus.</p>
+                    <a 
+                      href="https://www.amazon.com/s?k=5v+relay+module+dual" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Amazon →
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Box className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">LED + Buzzer ($1)</p>
-                    <p className="text-sm text-muted-foreground">Status only. Red=locked, green=open.</p>
+                  <div className="flex-1">
+                    <p className="font-medium">12V Solenoid ($8)</p>
+                    <p className="text-sm text-muted-foreground">Cabinet lock or drawer bolt.</p>
+                    <a 
+                      href="https://www.amazon.com/s?k=12v+solenoid+lock+electronic" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Amazon →
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Zap className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium">USB-C Power ($2)</p>
-                    <p className="text-sm text-muted-foreground">5V from any power bank. No battery management.</p>
+                  <div className="flex-1">
+                    <p className="font-medium">Power Bank (BYO)</p>
+                    <p className="text-sm text-muted-foreground">Any USB power bank you have.</p>
+                    <span className="text-xs text-muted-foreground">Or buy: 10000mAh Anker ~$15</span>
                   </div>
                 </div>
               </div>
@@ -312,6 +345,170 @@ export default function StarterPack() {
           </CardContent>
         </Card>
 
+        {/* Buy Components - Quick Links */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Get the Parts</CardTitle>
+            <CardDescription>
+              Verified sources. Prices fluctuate, shop around.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">ESP32-C3 DevKit</p>
+                  <Badge>~$3</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  ESP32-C3-DevKitM-1 or NodeMCU-C3
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs" 
+                    onClick={() => window.open('https://www.aliexpress.com/wholesale?SearchText=esp32-c3-devkit', '_blank')}>
+                    AliExpress
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">PN532 NFC Module</p>
+                  <Badge>~$3</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  I2C interface, with antenna
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs"
+                    onClick={() => window.open('https://www.amazon.com/s?k=pn532+nfc+module', '_blank')}>
+                    Amazon
+                  </Button>
+                  <Button size="sm" variant="outline" className="flex-1 text-xs"
+                    onClick={() => window.open('https://www.aliexpress.com/wholesale?SearchText=pn532+module', '_blank')}>
+                    AliExpress
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">5V Relay Module</p>
+                  <Badge>~$3</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  2-channel or 4-channel, opto-isolated
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs"
+                    onClick={() => window.open('https://www.amazon.com/s?k=5v+relay+module', '_blank')}>
+                    Amazon
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">12V Solenoid Lock</p>
+                  <Badge>~$8</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Fail-secure, cabinet/drawer size
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs"
+                    onClick={() => window.open('https://www.aliexpress.com/wholesale?SearchText=12v+solenoid+lock', '_blank')}>
+                    AliExpress
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">Ammo Can</p>
+                  <Badge>~$15</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Fat 50 or .50 cal surplus
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs"
+                    onClick={() => window.open('https://www.amazon.com/s?k=ammo+can+fat+50', '_blank')}>
+                    Amazon
+                  </Button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-medium">USB Power Bank</p>
+                  <Badge>BYO</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Any 5V 2A+ power bank you have
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" className="flex-1 text-xs" disabled>
+                    Repurpose Yours
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 bg-muted rounded-lg text-sm text-muted-foreground">
+              <p className="font-medium text-foreground mb-2">⚠️ Note on Sources</p>
+              <p>
+                Prices and availability vary by region. These are common sources, but you may find 
+                better deals locally. Check electronics distributors (DigiKey, Mouser) for bulk orders.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Community Sourcing */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Community Verified Sources</CardTitle>
+            <CardDescription>
+              Regional suppliers discovered by the community
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2">Region</th>
+                    <th className="text-left py-2">Supplier</th>
+                    <th className="text-left py-2">Good For</th>
+                    <th className="text-left py-2">Verified</th>
+                  </tr>
+                </thead>
+                <tbody className="text-muted-foreground">
+                  <tr className="border-b">
+                    <td className="py-2">Global</td>
+                    <td className="py-2">AliExpress</td>
+                    <td className="py-2">Everything</td>
+                    <td className="py-2">—</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2">US</td>
+                    <td className="py-2">Amazon, Adafruit</td>
+                    <td className="py-2">NFC, Relays</td>
+                    <td className="py-2">@plutarch</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <p className="text-sm">
+                <strong>Know a good source?</strong> Submit a PR to the repo with your regional 
+                supplier and we'll add it to help others in your area.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Call to Action */}
         <div className="text-center space-y-4">
           <h3 className="text-xl font-bold">"Start with $25. Grow with your needs."</h3>
@@ -321,22 +518,85 @@ export default function StarterPack() {
             from the bottom up.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button size="lg">
+            <Button size="lg" onClick={() => window.open('https://github.com/PlutarchsEcho/nostr-dead-drop-lockers/blob/main/STARTER_PACK.md', '_blank')}>
               <DollarSign className="h-4 w-4 mr-2" />
-              Get the Starter BOM
+              Get the Full BOM
             </Button>
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" onClick={() => window.open('https://github.com/PlutarchsEcho/nostr-dead-drop-lockers/discussions', '_blank')}>
               <MapPin className="h-4 w-4 mr-2" />
-              Find Starter Builders
+              Share Your Build
             </Button>
           </div>
         </div>
+
+        {/* Community Sources */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Community Verified Sources</CardTitle>
+            <CardDescription>Real parts that builders have used successfully</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2">Region</th>
+                    <th className="text-left py-2">Store</th>
+                    <th className="text-left py-2">Part</th>
+                    <th className="text-left py-2">Cost</th>
+                    <th className="text-left py-2">Verified</th>
+                  </tr>
+                </thead>
+                <tbody className="text-muted-foreground">
+                  <tr className="border-b">
+                    <td className="py-2">🇺🇸 US</td>
+                    <td>Amazon</td>
+                    <td>ESP32-C3 DevKit</td>
+                    <td>$3.50</td>
+                    <td className="text-xs">@Plutarch</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2">🇺🇸 US</td>
+                    <td>Amazon</td>
+                    <td>PN532 NFC Module</td>
+                    <td>$3.20</td>
+                    <td className="text-xs">@Plutarch</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2">🇪🇺 EU</td>
+                    <td>AliExpress</td>
+                    <td>12V Solenoid Lock</td>
+                    <td>€6.80</td>
+                    <td className="text-xs italic">Need verification</td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="py-2">🇬🇧 UK</td>
+                    <td>Pimoroni</td>
+                    <td>ESP32-C3</td>
+                    <td>£4.50</td>
+                    <td className="text-xs italic">Need verification</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
+              <p className="font-medium mb-1">Add your source</p>
+              <p className="text-muted-foreground">
+                Built one? Found a good supplier? Submit the details via{' '}
+                <a href="https://github.com/PlutarchsEcho/nostr-dead-drop-lockers/issues/new" className="text-primary hover:underline">
+                  GitHub Issue
+                </a>{' '}
+                and we'll add it to the list.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Footer */}
         <div className="mt-12 text-center text-sm text-muted-foreground">
           <p>
             Full starter pack documentation in{' '}
-            <a href="https://github.com/PlutarchsEcho/deaddrop-hardware/blob/main/STARTER_PACK.md" className="text-primary hover:underline">
+            <a href="https://github.com/PlarchsEcho/nostr-dead-drop-lockers/blob/main/STARTER_PACK.md" className="text-primary hover:underline">
               STARTER_PACK.md
             </a>
           </p>

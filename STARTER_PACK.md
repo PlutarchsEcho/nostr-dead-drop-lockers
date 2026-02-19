@@ -31,35 +31,18 @@ Target users:
 
 ### Core Components ($12 total)
 
-```
-Microcontroller: ESP32-C3 (single-core, WiFi/BLE, $3)
-  - Cheaper than S3, sufficient for MVP
-  - No PSRAM needed for starter
-  - 4MB flash adequate
+| Component | Spec | Est. Cost | Where to Buy |
+|-----------|------|-----------|--------------|
+| **ESP32-C3** | SuperMini or DevKit, 4MB flash | ~$3 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=esp32-c3-supermini) • [Amazon](https://amazon.com/s?k=esp32-c3-devkit) |
+| **NFC Reader** | PN532 I2C module | ~$3 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=pn532+nfc+module) • [Amazon](https://amazon.com/s?k=pn532+nfc+module) |
+| **Relay Module** | 5V dual relay, optocoupler | ~$3 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=5v+dual+relay+module) • [Amazon](https://amazon.com/s?k=5v+dual+relay+module) |
+| **RGB LED** | Common anode + resistors | ~$0.50 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=rgb+led+5mm) • Any electronics store |
+| **Buzzer** | 5V active piezo | ~$0.50 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=piezo+buzzer+5v) • Any electronics store |
+| **USB-C Cable** | Power only, 1m | ~$2 | Any dollar store, often free with phones |
+| **Jumper Wires** | Dupont M-M, 40pcs | ~$1 | [AliExpress](https://www.aliexpress.com/wholesale?SearchText=dupont+jumper+wires) • Comes with most kits |
+| **USB Power Bank** | 10,000mAh minimum | ~$10 | BYO or any convenience store |
 
-NFC Reader: PN532 I2C ($3)
-  - Only input method (no keypad, no screen)
-  - Users tap phone or card to unlock
-
-LED + Buzzer: ($1)
-  - RGB LED for status (red=locked, green=open, blue=busy)
-  - Piezo for audio feedback
-
-Power: USB-C + 5V regulator ($2)
-  - Runs off any power bank
-  - No battery management needed
-  - 5V direct to solenoid (small ones)
-
-Relay: 5V dual relay module ($3)
-  - Drive lock actuator
-  - Simple, no RS-485 needed for single-lock
-
-PCB: 2-layer, 50x40mm ($1)
-  - Minimal routing
-  - JLCPCB 5pcs = $5 total
-
---- Total: ~$12 ---
-```
+**Controller subtotal: ~$12** (without power bank)
 
 ### What Got Cut (and Why It's OK)
 
