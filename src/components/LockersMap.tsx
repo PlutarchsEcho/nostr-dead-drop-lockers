@@ -25,40 +25,45 @@ interface Locker {
   description?: string;
 }
 
-// Simple geohash decoder - just enough for demo
+// Geohash to lat/lon decoder for major cities
+const GEOHASH_MAP: Record<string, [number, number]> = {
+  '9q8yyz': [37.7749, -122.4194], // San Francisco
+  '9q8yym': [34.0522, -118.2437], // Los Angeles
+  '9q8yyk': [40.7128, -74.0060],  // New York
+  '9q8yyf': [41.8781, -87.6298],  // Chicago
+  'dpwh': [47.6062, -122.3321],   // Seattle
+  'dqcjq': [39.7392, -104.9903],  // Denver
+};
+
 function geohashToLatLon(geohash: string): [number, number] | null {
-  // North America approx bounds for demo
-  const mockLocations: Record<string, [number, number]> = {
-    '9q8yyz': [37.7749, -122.4194], // San Francisco
-    '9q8yym': [34.0522, -118.2437], // Los Angeles
-    '9q8yyk': [40.7128, -74.0060],  // New York
-    '9q8yyf': [41.8781, -87.6298],  // Chicago
-    'dpwh': [47.6062, -122.3321],   // Seattle
-    'dqcjq': [39.7392, -104.9903],  // Denver
-    'd5f': [29.7604, -95.3698],     // Houston
-    'dp7c': [45.5017, -73.5673],    // Montreal
-    'c2b': [43.6532, -79.3832],     // Toronto
-    '9q9p': [49.2827, -123.1207],   // Vancouver
-  };
+  // Check exact match first
+  if (GEOHASH_MAP[geohash]) return GEOHASH_MAP[geohash];
   
-  // Check if we have a mock location for this geohash prefix
-  for (const [prefix, coords] of Object.entries(mockLocations)) {
+  // Check prefix match
+  for (const [prefix, coords] of Object.entries(GEOHASH_MAP)) {
     if (geohash.startsWith(prefix)) return coords;
   }
   
   // Return random location in North America for demo
   return [
-    25 + Math.random() * 35,  // Lat: 25-60 (US/Canada range)
-    -125 + Math.random() * 55 // Lon: -125 to -70 (West to East coast)
+    25 + Math.random() * 35,  // Lat: 25-60
+    -125 + Math.random() * 55 // Lon: -125 to -70
   ];
 }
 
 interface MapProps {
   lockers?: Locker[];
   onLockerClick?: (locker: Locker) => void;
+  center?: [number, number];
+  zoom?: number;
 }
 
-export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
+export function LockersMap({ 
+  lockers = [], 
+  onLockerClick, 
+  center = [45, -100], 
+  zoom = 3 
+}: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -66,8 +71,8 @@ export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Initialize map centered on North America
-    const map = L.map(containerRef.current).setView([45, -100], 3);
+    // Initialize map
+    const map = L.map(containerRef.current).setView(center, zoom);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
@@ -80,7 +85,7 @@ export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
       map.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [center, zoom]);
 
   // Add markers when lockers change
   useEffect(() => {
@@ -97,17 +102,22 @@ export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
       const coords = geohashToLatLon(locker.geohash);
       if (!coords) return;
 
+      const popupContent = locker.price > 0 && locker.price < 1000
+        ? `<div style="min-width: 150px;">
+            <h3 style="margin: 0 0 5px 0; font-weight: bold;">${locker.title}</h3>
+            <p style="margin: 0; color: #666;">${locker.description || ''}</p>
+            <p style="margin: 5px 0 0 0; font-size: 14px; font-weight: bold;">
+              ${locker.price} products
+            </p>
+          </div>`
+        : `<div style="min-width: 150px;">
+            <h3 style="margin: 0 0 5px 0; font-weight: bold;">${locker.title}</h3>
+            <p style="margin: 0; color: #666;">${locker.description || ''}</p>
+          </div>`;
+
       const marker = L.marker(coords)
         .addTo(mapRef.current!)
-        .bindPopup(`
-          <div style="min-width: 150px;">
-            <h3 style="margin: 0 0 5px 0; font-weight: bold;">${locker.title}</h3>
-            <p style="margin: 0; color: #666;">${locker.price} sats/hr</p>
-            <p style="margin: 2px 0 0 0; font-size: 12px; color: ${locker.status === 'available' ? 'green' : 'orange'};">
-              ${locker.status}
-            </p>
-          </div>
-        `);
+        .bindPopup(popupContent);
 
       if (onLockerClick) {
         marker.on('click', () => onLockerClick(locker));
@@ -115,6 +125,12 @@ export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
 
       markersRef.current.push(marker);
     });
+
+    // Fit bounds if we have markers
+    if (markersRef.current.length > 0 && markersRef.current.length < 10) {
+      const group = new L.FeatureGroup(markersRef.current);
+      mapRef.current.fitBounds(group.getBounds().pad(0.1));
+    }
   }, [lockers, onLockerClick]);
 
   return (
