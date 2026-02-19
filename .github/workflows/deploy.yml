@@ -33,15 +33,11 @@ jobs:
       - name: Build
         run: npm run build
         
-      - name: Fix CSP for GitHub Pages
+      - name: Fix CSP
         run: |
-          # Remove restrictive CSP that breaks cross-origin assets
-          sed -i 's|<meta http-equiv="content-security-policy" content="[^"]*">|<!-- CSP disabled for deployment -->|' dist/index.html
+          sed -i 's|<meta http-equiv="content-security-policy" content="[^"]*">|<!-- CSP disabled -->|' dist/index.html
         
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        
-      - name: Upload artifact
+      - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
