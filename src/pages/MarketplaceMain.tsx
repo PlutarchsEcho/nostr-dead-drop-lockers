@@ -560,53 +560,109 @@ export default function MarketplaceMain() {
   );
 }
 
-// No lockers in area component
+// Partner e-commerce sites
+const PARTNER_SITES = [
+  {
+    name: 'PrivacyTools.io',
+    url: 'https://www.privacytools.io',
+    description: 'Privacy-focused software and hardware recommendations',
+    category: 'Privacy Tools',
+  },
+  {
+    name: 'CoinKite',
+    url: 'https://coldcard.com',
+    description: 'Bitcoin hardware wallets and security devices',
+    category: 'Bitcoin',
+  },
+  {
+    name: 'Purism',
+    url: 'https://puri.sm',
+    description: 'Privacy-respecting laptops and phones',
+    category: 'Electronics',
+  },
+  {
+    name: 'Silent Pocket',
+    url: 'https://silentpocket.com',
+    description: 'Faraday bags and signal blocking accessories',
+    category: 'Accessories',
+  },
+  {
+    name: 'Privacy Pros',
+    url: 'https://privacypros.io',
+    description: 'Billfodl and crypto security products',
+    category: 'Bitcoin',
+  },
+  {
+    name: 'Decentralized Web',
+    url: 'https://getdweb.net',
+    description: 'Decentralized web hosting and services',
+    category: 'Services',
+  },
+];
+
+// No lockers in area component - shows partner sites instead
 function NoLockersInArea({ location, onClear }: { location: string; onClear: () => void }) {
   return (
-    <Card className="text-center py-12 max-w-2xl mx-auto">
-      <CardContent className="space-y-6">
-        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
-          <MapPin className="h-10 w-10 text-muted-foreground" />
-        </div>
-        
-        <div>
-          <h3 className="text-2xl font-bold mb-2">No Lockers in {location}</h3>
-          <p className="text-muted-foreground text-lg">
-            Products on DeadDropstr ship to secure lockers for anonymous pickup.
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Info banner */}
+      <Card className="bg-primary/5 border-primary/20">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+              <MapPin className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-1">No Lockers in {location}</h3>
+              <p className="text-muted-foreground">
+                DeadDropstr lockers aren't available in your area yet. 
+                Check out these partner sites that ship directly while we expand.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <div className="bg-muted p-4 rounded-lg text-left">
-          <p className="font-medium mb-2">Why no results?</p>
-          <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-            <li>There are no lockers near {location} yet</li>
-            <li>Vendors can only ship to locations with active lockers</li>
-            <li>As a locker provider, you'd enable commerce in your area</li>
-          </ul>
+      {/* Partner sites grid */}
+      <div>
+        <h3 className="text-xl font-bold mb-4">Featured Partner Stores</h3>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {PARTNER_SITES.map((partner) => (
+            <Card key={partner.name} className="hover:border-primary transition-colors group">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                    {partner.name}
+                  </CardTitle>
+                  <Badge variant="secondary">{partner.category}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {partner.description}
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => window.open(partner.url, '_blank')}
+                >
+                  Visit Store →
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+      </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild>
-            <Link to="/dashboard">
-              <Plus className="h-4 w-4 mr-2" />
-              Become a Locker Provider
-            </Link>
-          </Button>
-          <Button variant="outline" onClick={onClear}>
-            Clear Search
-          </Button>
-        </div>
-
-        <div className="text-sm text-muted-foreground pt-4 border-t">
-          <p className="font-medium mb-2">What is a locker provider?</p>
-          <p>
-            Set up a secure drop box at your location. Buyers' orders ship to you, 
-            you place them in the locker, and buyers pick up with a digital code. 
-            Earn fees for each transaction.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Alternative actions */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 border-t">
+        <Button variant="outline" onClick={onClear}>
+          Clear Search
+        </Button>
+        <Button variant="outline" onClick={() => window.open('https://github.com/PlutarchsEcho/nostr-dead-drop-lockers', '_blank')}>
+          Request Locker in {location}
+        </Button>
+      </div>
+    </div>
   );
 }
 
