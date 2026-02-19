@@ -9,6 +9,7 @@ import SnapshotPublisher from './pages/SnapshotPublisher';
 import UserDashboard from './pages/UserDashboard';
 import ProxyDropsInfo from './pages/ProxyDropsInfo';
 import HardwareArchitecture from './pages/HardwareArchitecture';
+import StarterPack from './pages/StarterPack';
 
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
@@ -31,6 +32,7 @@ export function AppRouter() {
         <Route path="/my-lockers" element={<UserDashboard />} />
         <Route path="/proxy-drops" element={<ProxyDropsInfo />} />
         <Route path="/hardware" element={<HardwareArchitecture />} />
+        <Route path="/starter-pack" element={<StarterPack />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/locker/:nip19" element={<LockerDetail />} />
         {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1 */}

@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Map, Settings, MessageSquare, Home, Package, Shield, Cpu } from 'lucide-react';
+import { Map, Settings, MessageSquare, Home, Package, Shield, Cpu, DollarSign } from 'lucide-react';
 
 export default function TopNav() {
   const location = useLocation();
@@ -74,6 +74,16 @@ export default function TopNav() {
               <Link to="/hardware">
                 <Cpu className="h-4 w-4 mr-1" />
                 Hardware
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant={isActive('/starter-pack') ? 'secondary' : 'ghost'}
+              size="sm"
+            >
+              <Link to="/starter-pack">
+                <DollarSign className="h-4 w-4 mr-1" />
+                Starter
               </Link>
             </Button>
             <Button
