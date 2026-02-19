@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Search, Filter, Package, Store, Map as MapIcon, List, MapPin, Star, ExternalLink } from 'lucide-react';
+import { Search, Filter, Package, Store, Map as MapIcon, List, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -330,37 +330,23 @@ export default function MarketplaceMain() {
               </div>
             )}
 
-            {/* Featured Sellers - only show if they service this area */}
+            {/* Local sellers - casual P2P section */}
             {showSellers && (
-              <div className="border-t pt-6 mt-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold">Featured Sellers</h3>
-                    <p className="text-sm text-muted-foreground">
-                      These sellers offer local drop-off to lockers near {locationSearch}
-                    </p>
-                  </div>
-                  <Badge variant="outline">{relevantSellers.length} in area</Badge>
-                </div>
-                <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              <div className="border-t border-dashed pt-6 mt-8">
+                <h3 className="text-sm font-medium text-muted-foreground mb-3">
+                  Local sellers who ship to these lockers
+                </h3>
+                <div className="flex flex-wrap gap-2">
                   {relevantSellers.map(seller => (
-                    <FeaturedSellerCard key={seller.id} seller={seller} />
+                    <Button key={seller.id} variant="outline" size="sm" className="h-auto py-1.5">
+                      <Store className="h-3 w-3 mr-1.5" />
+                      {seller.name}
+                    </Button>
                   ))}
+                  <Button variant="ghost" size="sm" className="h-auto py-1.5 text-muted-foreground">
+                    Sell here →
+                  </Button>
                 </div>
-                
-                {/* Premium placement CTA */}
-                <Card className="mt-4 bg-muted/50">
-                  <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                      <p className="text-sm text-muted-foreground">
-                        Want to be featured here? Reach buyers in {locationSearch} for 10k sats/month
-                      </p>
-                      <Button size="sm" variant="outline">
-                        Get Featured
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             )}
           </div>
@@ -455,100 +441,32 @@ function LockerCard({ locker, compact = false }: { locker: Locker; compact?: boo
   );
 }
 
-// Featured seller card - compact ad style
-function FeaturedSellerCard({ seller }: { seller: FeaturedSeller }) {
-  return (
-    <Card className={`hover:border-primary transition-colors ${seller.isPremium ? 'border-primary/30 bg-primary/5' : ''}`}>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${seller.isPremium ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-            <Store className="h-5 w-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="font-medium truncate">{seller.name}</p>
-              {seller.isPremium && <Star className="h-3 w-3 text-primary fill-primary" />}
-            </div>
-            <p className="text-xs text-muted-foreground line-clamp-1">{seller.tagline}</p>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-              <span>★ {seller.trustScore}</span>
-              <span>•</span>
-              <span>{seller.sales} sales</span>
-            </div>
-          </div>
-        </div>
-        <div className="mt-3">
-          <p className="text-xs text-muted-foreground mb-1">Sells:</p>
-          <div className="flex flex-wrap gap-1">
-            {seller.items.slice(0, 3).map(item => (
-              <Badge key={item} variant="outline" className="text-xs">{item}</Badge>
-            ))}
-          </div>
-        </div>
-        <Button variant="outline" size="sm" className="w-full mt-3">
-          View Store <ExternalLink className="h-3 w-3 ml-1" />
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-// No lockers state with community callout
+// No lockers state
 function NoLockersState({ location, onClear }: { location: string; onClear: () => void }) {
   return (
-    <div className="space-y-6">
-      <Card className="text-center py-12">
-        <CardContent className="space-y-4">
-          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
-            <MapPin className="h-10 w-10 text-muted-foreground" />
-          </div>
-          
-          <div>
-            <h3 className="text-2xl font-bold mb-2">No Lockers in {location}</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              DeadDropstr uses secure lockers for anonymous exchanges. 
-              Help bring privacy-first commerce to your area.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-            <Button asChild>
-              <Link to="/dashboard">
-                <Package className="h-4 w-4 mr-2" />
-                Host a Locker
-              </Link>
-            </Button>
-            <Button variant="outline" onClick={onClear}>
-              Clear Search
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Featured sellers who could expand here */}
-      <div>
-        <h3 className="text-lg font-bold mb-4">Sellers Interested in {location}</h3>
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {FEATURED_SELLERS.filter(s => s.isPremium).slice(0, 3).map(seller => (
-            <Card key={seller.id} className="opacity-75">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
-                    <Store className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{seller.name}</p>
-                    <p className="text-xs text-muted-foreground">Would expand here with lockers</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    <Card className="text-center py-12">
+      <CardContent className="space-y-4">
+        <MapPin className="h-12 w-12 mx-auto text-muted-foreground" />
+        
+        <div>
+          <h3 className="text-xl font-bold mb-2">No lockers in {location}</h3>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Be the first to host a locker and enable local P2P trades.
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground mt-3 text-center">
-          Premium sellers are waiting to serve {location}. Be the first to host a locker!
-        </p>
-      </div>
-    </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+          <Button asChild>
+            <Link to="/dashboard">
+              <Package className="h-4 w-4 mr-2" />
+              Host a Locker
+            </Link>
+          </Button>
+          <Button variant="outline" onClick={onClear}>
+            Clear Search
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
