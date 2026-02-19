@@ -7,6 +7,7 @@ import MarketplaceMain from './pages/MarketplaceMain';
 import ProductDetail from './pages/ProductDetail';
 import SnapshotPublisher from './pages/SnapshotPublisher';
 import UserDashboard from './pages/UserDashboard';
+import ProxyDropManager from './pages/ProxyDropManager';
 
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
@@ -27,6 +28,7 @@ export function AppRouter() {
         <Route path="/snapshot" element={<SnapshotPublisher />} />
         <Route path="/dashboard" element={<OwnerDashboard />} />
         <Route path="/my-lockers" element={<UserDashboard />} />
+        <Route path="/proxy-drops" element={<ProxyDropManager />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/locker/:nip19" element={<LockerDetail />} />
         {/* NIP-19 route for npub1, note1, naddr1, nevent1, nprofile1 */}

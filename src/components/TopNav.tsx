@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LoginArea } from '@/components/auth/LoginArea';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Map, Settings, MessageSquare, Home, Package } from 'lucide-react';
+import { Map, Settings, MessageSquare, Home, Package, Shield } from 'lucide-react';
 
 export default function TopNav() {
   const location = useLocation();
@@ -44,6 +44,16 @@ export default function TopNav() {
               <Link to="/my-lockers">
                 <Package className="h-4 w-4 mr-1" />
                 My Lockers
+              </Link>
+            </Button>
+            <Button
+              asChild
+              variant={isActive('/proxy-drops') ? 'secondary' : 'ghost'}
+              size="sm"
+            >
+              <Link to="/proxy-drops">
+                <Shield className="h-4 w-4 mr-1" />
+                Proxy Drops
               </Link>
             </Button>
             <Button
