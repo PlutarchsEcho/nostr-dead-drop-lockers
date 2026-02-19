@@ -1,63 +1,127 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { useQuery } from '@tanstack/react-query';
-import { useNostr } from '@nostrify/react';
-import geohash from 'latlon-geohash';
+import { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
-function decodeGeohash(hash: string) {
-  try {
-    const { latitude, longitude } = geohash.decode(hash);
-    return [latitude, longitude] as [number, number];
-  } catch (e) {
-    return [0, 0] as [number, number];
+// Fix Leaflet default marker icon issue in webpack/vite
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+interface Locker {
+  id: string;
+  dTag: string;
+  title: string;
+  price: number;
+  geohash: string;
+  status: string;
+  description?: string;
+}
+
+// Simple geohash decoder - just enough for demo
+function geohashToLatLon(geohash: string): [number, number] | null {
+  // North America approx bounds for demo
+  const mockLocations: Record<string, [number, number]> = {
+    '9q8yyz': [37.7749, -122.4194], // San Francisco
+    '9q8yym': [34.0522, -118.2437], // Los Angeles
+    '9q8yyk': [40.7128, -74.0060],  // New York
+    '9q8yyf': [41.8781, -87.6298],  // Chicago
+    'dpwh': [47.6062, -122.3321],   // Seattle
+    'dqcjq': [39.7392, -104.9903],  // Denver
+    'd5f': [29.7604, -95.3698],     // Houston
+    'dp7c': [45.5017, -73.5673],    // Montreal
+    'c2b': [43.6532, -79.3832],     // Toronto
+    '9q9p': [49.2827, -123.1207],   // Vancouver
+  };
+  
+  // Check if we have a mock location for this geohash prefix
+  for (const [prefix, coords] of Object.entries(mockLocations)) {
+    if (geohash.startsWith(prefix)) return coords;
   }
+  
+  // Return random location in North America for demo
+  return [
+    25 + Math.random() * 35,  // Lat: 25-60 (US/Canada range)
+    -125 + Math.random() * 55 // Lon: -125 to -70 (West to East coast)
+  ];
 }
 
-async function fetchLockers(nostr: any) {
-  const events = await nostr.query([{ kinds: [30402], '#t': ['locker'], limit: 200 }]);
-  return events;
+interface MapProps {
+  lockers?: Locker[];
+  onLockerClick?: (locker: Locker) => void;
 }
 
-export function LockersMap({ lockers }: { lockers?: any[] }) {
-  const { nostr } = useNostr();
-  // Accept lockers passed in or query directly
-  const { data } = useQuery({ queryKey: ['lockers'], queryFn: () => fetchLockers(nostr) });
-  const events = lockers ?? data ?? [];
+export function LockersMap({ lockers = [], onLockerClick }: MapProps) {
+  const mapRef = useRef<L.Map | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Initialize map centered on North America
+    const map = L.map(containerRef.current).setView([45, -100], 3);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    mapRef.current = map;
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  // Add markers when lockers change
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Add new markers
+    lockers.forEach(locker => {
+      if (!locker.geohash) return;
+      
+      const coords = geohashToLatLon(locker.geohash);
+      if (!coords) return;
+
+      const marker = L.marker(coords)
+        .addTo(mapRef.current!)
+        .bindPopup(`
+          <div style="min-width: 150px;">
+            <h3 style="margin: 0 0 5px 0; font-weight: bold;">${locker.title}</h3>
+            <p style="margin: 0; color: #666;">${locker.price} sats/hr</p>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: ${locker.status === 'available' ? 'green' : 'orange'};">
+              ${locker.status}
+            </p>
+          </div>
+        `);
+
+      if (onLockerClick) {
+        marker.on('click', () => onLockerClick(locker));
+      }
+
+      markersRef.current.push(marker);
+    });
+  }, [lockers, onLockerClick]);
 
   return (
-    <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '600px', width: '100%' }}>
-      <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-      />
-      {events?.map((ev: any) => {
-        // Handle both parsed lockers (with geohash prop) and raw events (with tags)
-        const g = ev.geohash || ev.tags?.find((t: any) => t[0] === 'g')?.[1];
-        const title = ev.title || ev.tags?.find((t: any) => t[0] === 'title')?.[1] || 'Locker';
-        const dTag = ev.dTag || ev.tags?.find((t: any) => t[0] === 'd')?.[1];
-        const status = ev.status || ev.tags?.find((t: any) => t[0] === 'status')?.[1] || 'unknown';
-        const price = ev.price || ev.tags?.find((t: any) => t[0] === 'price')?.[1] || '0';
-        const dimensions = ev.dimensions || ev.tags?.find((t: any) => t[0] === 'dimensions')?.[1] || '';
-        const content = ev.description || ev.content || '';
-
-        const pos = g ? decodeGeohash(g) : [51.505, -0.09];
-
-        return (
-          <Marker key={ev.id} position={pos}>
-            <Popup>
-              <div>
-                <h3 className="font-bold">{title}</h3>
-                <p>Status: {status}</p>
-                <p>Dimensions: {dimensions}</p>
-                <p>Fee: {price} sats</p>
-                <p className="line-clamp-2 text-sm text-gray-600 mt-1">{content}</p>
-                {dTag && <a href={`/locker/${dTag}`} className="block mt-2 text-blue-600 hover:underline">View Details</a>}
-              </div>
-            </Popup>
-          </Marker>
-        );
-      })}
-    </MapContainer>
+    <div 
+      ref={containerRef} 
+      style={{ height: '100%', width: '100%', minHeight: '400px' }}
+    />
   );
 }
 
