@@ -22,19 +22,22 @@ export default function ProxyDropsInfo() {
             <CardHeader>
               <CardTitle>What is a Proxy?</CardTitle>
               <CardDescription>
-                A proxy is someone who places an item in a locker for you
+                A paid service to handle your locker drop
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                You might use a proxy when:
+                A proxy receives your package and places it in a locker for a fee. 
+                This is useful when you can't be there in person.
               </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>You're shipping something but can't be there in person</li>
-                <li>The locker owner offers a proxy service</li>
-                <li>You hire a courier to handle the drop</li>
-                <li>A friend agrees to place the item for you</li>
-              </ul>
+              <div className="bg-muted p-4 rounded-lg">
+                <p className="font-medium mb-2">Typical proxy fees:</p>
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>Locker owner proxy: 5,000 - 15,000 sats per drop</li>
+                  <li>Courier service: 10,000 - 50,000 sats per drop</li>
+                  <li>Friend/acquaintance: Whatever you agree on</li>
+                </ul>
+              </div>
             </CardContent>
           </Card>
 
@@ -72,6 +75,18 @@ export default function ProxyDropsInfo() {
                   3
                 </div>
                 <div>
+                  <p className="font-medium">Pay the proxy fee</p>
+                  <p className="text-sm text-muted-foreground">
+                    Send sats via Lightning (usually upfront, sometimes half now/half after)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 font-bold text-primary">
+                  4
+                </div>
+                <div>
                   <p className="font-medium">Message your proxy the code</p>
                   <p className="text-sm text-muted-foreground">
                     Send them the locker access code via Nostr DM (or any secure chat)
@@ -81,7 +96,7 @@ export default function ProxyDropsInfo() {
 
               <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 font-bold text-primary">
-                  4
+                  5
                 </div>
                 <div>
                   <p className="font-medium">They drop it off</p>
