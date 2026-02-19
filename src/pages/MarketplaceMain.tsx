@@ -330,13 +330,46 @@ export default function MarketplaceMain() {
               </div>
             )}
 
-            {/* Local sellers - casual P2P section */}
-            {showSellers && (
+            {/* Featured Circular Economy Seller */}
+            {filteredLockers.length > 0 && (
               <div className="border-t border-dashed pt-6 mt-8">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                  Local sellers who ship to these lockers
-                </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-sm font-medium text-muted-foreground">
+                    Featured from the circular economy
+                  </h3>
+                  <Badge variant="outline" className="text-xs">P2P Network</Badge>
+                </div>
+                
+                <Card className="bg-muted/30">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row gap-4 items-start">
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
+                        <Store className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-semibold">CryptoVault</h4>
+                          <Badge variant="secondary" className="text-xs">★ 4.9 Trust</Badge>
+                          <Badge variant="outline" className="text-xs">156 sales</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Premium hardware wallets & security devices. Ships to any locker or local drop-off.
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <Badge variant="outline" className="text-xs">ColdCard</Badge>
+                          <Badge variant="outline" className="text-xs">SeedSigner</Badge>
+                          <Badge variant="outline" className="text-xs">Faraday Bags</Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button size="sm" variant="outline">Message</Button>
+                        <Button size="sm">View Store</Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <div className="flex flex-wrap gap-2 mt-3">
                   {relevantSellers.map(seller => (
                     <Button key={seller.id} variant="outline" size="sm" className="h-auto py-1.5">
                       <Store className="h-3 w-3 mr-1.5" />
@@ -344,7 +377,7 @@ export default function MarketplaceMain() {
                     </Button>
                   ))}
                   <Button variant="ghost" size="sm" className="h-auto py-1.5 text-muted-foreground">
-                    Sell here →
+                    Join network →
                   </Button>
                 </div>
               </div>
