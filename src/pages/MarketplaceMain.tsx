@@ -26,6 +26,12 @@ interface Locker {
   owner: string;
   dimensions?: string;
   features: string[];
+  // Proxy service - can be same owner or third party
+  proxyService?: {
+    available: boolean;
+    fee: number; // per drop fee
+    name: string;
+  };
 }
 
 // Featured seller - only shows if they service the searched area
@@ -56,6 +62,11 @@ const MOCK_LOCKERS: Locker[] = [
     owner: 'npub1owner1...',
     dimensions: '40x50x60 cm',
     features: ['24/7 Access', 'Camera', 'Climate Controlled'],
+    proxyService: {
+      available: true,
+      fee: 10000,
+      name: 'Alice (Owner)',
+    },
   },
   {
     id: '2',
@@ -69,6 +80,11 @@ const MOCK_LOCKERS: Locker[] = [
     owner: 'npub1owner2...',
     dimensions: '35x45x55 cm',
     features: ['Ground Floor', 'Discreet'],
+    proxyService: {
+      available: true,
+      fee: 15000,
+      name: 'Bob (Owner)',
+    },
   },
   {
     id: '3',
@@ -82,6 +98,7 @@ const MOCK_LOCKERS: Locker[] = [
     owner: 'npub1owner3...',
     dimensions: '50x60x70 cm',
     features: ['NFC Unlock', 'Indoor', 'WiFi'],
+    // Unmanned - third party proxies available
   },
   {
     id: '4',
@@ -95,6 +112,11 @@ const MOCK_LOCKERS: Locker[] = [
     owner: 'npub1owner4...',
     dimensions: '30x40x50 cm',
     features: ['Community Run', 'Cheap'],
+    proxyService: {
+      available: true,
+      fee: 8000,
+      name: 'Carol (Community)',
+    },
   },
 ];
 
@@ -463,6 +485,26 @@ function LockerCard({ locker, compact = false }: { locker: Locker; compact?: boo
         {locker.dimensions && (
           <p className="text-xs text-muted-foreground">{locker.dimensions}</p>
         )}
+        
+        {/* Proxy Service Info */}
+        <div className="pt-2 border-t">
+          {locker.proxyService?.available ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Proxy Service</p>
+                <p className="text-sm font-medium">{locker.proxyService.name}</p>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                +{locker.proxyService.fee.toLocaleString()} sats/drop
+              </Badge>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between text-muted-foreground">
+              <p className="text-xs">No proxy service - self-service only</p>
+              <Badge variant="outline" className="text-xs">Unmanned</Badge>
+            </div>
+          )}
+        </div>
       </CardContent>
       <CardFooter className="pt-0 flex items-center justify-between">
         <span className="text-lg font-bold">{locker.price} <span className="text-sm font-normal text-muted-foreground">sats/hr</span></span>
