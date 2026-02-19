@@ -15,7 +15,7 @@ import NotFound from "./pages/NotFound";
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/nostr-dead-drop-lockers">
       <ScrollToTop />
         <TopNav />
       <Routes>
