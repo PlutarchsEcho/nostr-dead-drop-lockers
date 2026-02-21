@@ -47,9 +47,9 @@
     .scene:nth-child(4) { animation-delay: 18s; }
     .scene:nth-child(5) { animation-delay: 24s; }
     @keyframes scene-cycle {
-      0%, 2% { opacity: 0; transform: translateX(20px); }
-      5%, 18% { opacity: 1; transform: translateX(0); }
-      22%, 100% { opacity: 0; transform: translateX(-20px); }
+      0%, 2% { opacity: 0; }
+      5%, 18% { opacity: 1; }
+      22%, 100% { opacity: 0; }
     }
     .screenshot-frame {
       position: absolute;
@@ -64,7 +64,7 @@
     }
     @keyframes ken-burns {
       0% { transform: scale(1); }
-      100% { transform: scale(1.08); }
+      100% { transform: scale(1.05); }
     }
     .info-overlay {
       position: absolute;
@@ -72,14 +72,13 @@
       left: 0;
       right: 0;
       background: linear-gradient(transparent, rgba(0,0,0,0.95) 30%);
-      padding: 50px 30px 30px;
-      transform: translateY(100%);
-      animation: slide-up 6s ease-out forwards;
+      padding: 50px 30px 40px;
+      animation: fade-in 6s ease-out forwards;
     }
-    @keyframes slide-up {
-      0%, 10% { transform: translateY(100%); opacity: 0; }
-      20%, 85% { transform: translateY(0); opacity: 1; }
-      95%, 100% { transform: translateY(20px); opacity: 0; }
+    @keyframes fade-in {
+      0%, 10% { opacity: 0; transform: translateY(20px); }
+      20%, 85% { opacity: 1; transform: translateY(0); }
+      95%, 100% { opacity: 0; }
     }
     .step-number {
       font-size: 12px;
@@ -90,12 +89,12 @@
       margin-bottom: 8px;
     }
     .step-title {
-      font-size: clamp(24px, 4vw, 36px);
+      font-size: clamp(22px, 4vw, 32px);
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .step-desc {
-      font-size: clamp(14px, 2vw, 18px);
+      font-size: clamp(13px, 2vw, 16px);
       color: #9ca3af;
       line-height: 1.5;
     }
@@ -103,15 +102,16 @@
       position: absolute;
       background: #10b981;
       color: #000;
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       animation: pop-in 6s ease-out forwards;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.4);
     }
     @keyframes pop-in {
-      0%, 25% { transform: scale(0); opacity: 0; }
-      35%, 80% { transform: scale(1); opacity: 1; }
+      0%, 20% { transform: scale(0); opacity: 0; }
+      30%, 80% { transform: scale(1); opacity: 1; }
       90%, 100% { transform: scale(0.9); opacity: 0; }
     }
     .progress-bar {
@@ -121,6 +121,7 @@
       right: 0;
       height: 4px;
       background: rgba(255,255,255,0.1);
+      z-index: 100;
     }
     .progress-fill {
       height: 100%;
@@ -134,7 +135,7 @@
     }
     .step-dots {
       position: absolute;
-      bottom: 20px;
+      bottom: 18px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -154,30 +155,20 @@
     .step-dot:nth-child(4) { animation-delay: 18s; }
     .step-dot:nth-child(5) { animation-delay: 24s; }
     @keyframes dot-active {
-      0%, 3% { background: rgba(255,255,255,0.3); }
+      0%, 3% { background: rgba(255,255,255,0.3); transform: scale(1); }
       6%, 16% { background: #f59e0b; transform: scale(1.3); }
       20%, 100% { background: rgba(255,255,255,0.3); transform: scale(1); }
     }
     .brand {
       position: absolute;
       top: 20px;
-      left: 30px;
+      left: 25px;
       z-index: 100;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 900;
       background: linear-gradient(135deg, #f59e0b, #dc2626);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    .cta-url {
-      font-family: monospace;
-      font-size: 16px;
-      color: #f59e0b;
-    }
-    .zero-fees {
-      font-size: 28px;
-      font-weight: 900;
-      color: #10b981;
     }
   </style>
 </head>
@@ -193,7 +184,7 @@
     </div>
     <div class="progress-bar"><div class="progress-fill"></div></div>
     
-    <!-- Scene 1: Map -->
+    <!-- Scene 1: Map (0-6s) -->
     <div class="scene">
       <div class="screenshot-frame">
         <img src="demo-frames/02_marketplace.png" class="screenshot" alt="Map">
@@ -203,61 +194,73 @@
         <div class="step-title">Find a Locker</div>
         <div class="step-desc">Browse the map to find secure lockers near you</div>
       </div>
-      <div class="highlight" style="top:30%;right:35%">📍 San Francisco</div>
-      <div class="highlight" style="top:45%;left:30%">⚡ 500 sats/hr</div>
+      <div class="highlight" style="top:35%;right:35%">📍 SF - 500 sats/hr</div>
     </div>
     
-    <!-- Scene 2: Locker Details -->
+    <!-- Scene 2: Homepage/Hero (6-12s) -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-frames/01_homepage.png" class="screenshot" alt="Details">
+        <img src="demo-frames/01_homepage.png" class="screenshot" alt="Features">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 2</div>
-        <div class="step-title">Check Availability</div>
-        <div class="step-desc">View features, location, and pricing</div>
+        <div class="step-title">Check the Network</div>
+        <div class="step-desc">View features, pricing, and available locations</div>
       </div>
-      <div class="highlight" style="top:35%;right:25%">✓ Available Now</div>
+      <div class="highlight" style="top:40%;left:30%">⚡ Lightning Only</div>
     </div>
     
-    <!-- Scene 3: Duration -->
+    <!-- Scene 3: Product Detail (12-18s) - Shows buying flow -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-frames/05_rentals.png" class="screenshot" alt="Duration">
+        <img src="demo-frames/03_product.png" class="screenshot" alt="Select">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 3</div>
-        <div class="step-title">Select Duration</div>
-        <div class="step-desc">Choose how long you need the locker</div>
+        <div class="step-title">Select & Book</div>
+        <div class="step-desc">Choose duration, see total cost in sats</div>
       </div>
-      <div class="highlight" style="top:40%;left:35%">24 hrs = 12,000 sats</div>
+      <div class="highlight" style="top:45%;right:28%">🔒 Secure Drop</div>
     </div>
     
-    <!-- Scene 4: Payment -->
+    <!-- Scene 4: Owner Dashboard (18-24s) - Shows config -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-frames/03_product.png" class="screenshot" alt="Payment">
+        <img src="demo-frames/04_dashboard.png" class="screenshot" alt="Config">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 4</div>
-        <div class="step-title">Pay with Lightning</div>
-        <div class="step-desc">Scan QR or pay with your wallet</div>
+        <div class="step-title">Configure Your Locker</div>
+        <div class="step-desc">Owners set rates, rules, and availability</div>
       </div>
-      <div class="highlight" style="top:50%;right:30%">⚡ Instant</div>
+      <div class="highlight" style="top:50%;left:35%">⚙️ Your Rules</div>
     </div>
     
-    <!-- Scene 5: Success -->
+    <!-- Scene 5: Success / CTA (24-30s) -->
     <div class="scene">
-      <div class="screenshot-frame" style="background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
-        <div style="text-align:center;padding:40px;">
-          <div style="font-size:64px;margin-bottom:20px;">🔓</div>
-          <div class="step-title">Access Granted</div>
-          <div class="step-desc" style="margin-bottom:20px;">Your code: <span style="font-family:monospace;background:#111;padding:4px 12px;border-radius:4px;">A7B9C2</span></div>
-          <div class="cta-url">plutarchsecho.github.io/nostr-dead-drop-lockers</div>
-          <div class="zero-fees" style="margin-top:15px;">0% Platform Fees</div>
+      <div class="screenshot-frame" style="background:#0a0a0a;">
+        <div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;">
+          <div style="font-size:72px;margin-bottom:20px;animation:bounce 2s infinite;">🔓</div>
+          <div class="step-title" style="font-size:36px;margin-bottom:10px;">Access Granted</div>
+          <div style="font-family:monospace;font-size:24px;background:#111;padding:12px 24px;border-radius:8px;margin:15px 0;border:2px solid #f59e0b;">
+            A7B9C2
+          </div>
+          <div style="color:#9ca3af;margin:10px 0;">Your access code</div>
+          <div style="font-family:monospace;color:#f59e0b;margin-top:20px;font-size:14px;">
+            plutarchsecho.github.io/nostr-dead-drop-lockers
+          </div>
+          <div style="color:#10b981;font-size:24px;font-weight:900;margin-top:15px;">
+            100% FOSS • 0% Platform Fees
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <style>
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
 </body>
 </html>
