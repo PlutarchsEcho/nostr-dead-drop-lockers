@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeadDropstr - Real Demo Walkthrough</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .demo-container {
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    
+    .scene {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      animation: scene-cycle 30s infinite;
+    }
+    .scene:nth-child(1) { animation-delay: 0s; }
+    .scene:nth-child(2) { animation-delay: 5s; }
+    .scene:nth-child(3) { animation-delay: 10s; }
+    .scene:nth-child(4) { animation-delay: 15s; }
+    .scene:nth-child(5) { animation-delay: 20s; }
+    .scene:nth-child(6) { animation-delay: 25s; }
+    
+    @keyframes scene-cycle {
+      0%, 1% { opacity: 0; }
+      3%, 16% { opacity: 1; }
+      18%, 100% { opacity: 0; }
+    }
+    
+    .screenshot {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Ken Burns effect - slow zoom/pan on each screenshot */
+    .ken-burns {
+      animation: ken-burns 5s ease-out forwards;
+    }
+    @keyframes ken-burns {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.08) translate(-2%, -1%); }
+    }
+    
+    .scene:nth-child(1) .ken-burns { animation-name: kb-1; }
+    .scene:nth-child(2) .ken-burns { animation-name: kb-2; }
+    .scene:nth-child(3) .ken-burns { animation-name: kb-3; }
+    .scene:nth-child(4) .ken-burns { animation-name: kb-4; }
+    .scene:nth-child(5) .ken-burns { animation-name: kb-5; }
+    .scene:nth-child(6) .ken-burns { animation-name: kb-6; }
+    
+    @keyframes kb-1 { 0% { transform: scale(1); } 100% { transform: scale(1.05) translateY(-2%); } }
+    @keyframes kb-2 { 0% { transform: scale(1); } 100% { transform: scale(1.05) translateX(-2%); } }
+    @keyframes kb-3 { 0% { transform: scale(1); } 100% { transform: scale(1.08) translate(-1%, -1%); } }
+    @keyframes kb-4 { 0% { transform: scale(1); } 100% { transform: scale(1.05) translateY(-3%); } }
+    @keyframes kb-5 { 0% { transform: scale(1); } 100% { transform: scale(1.05) translateX(2%); } }
+    @keyframes kb-6 { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+    
+    /* Overlay info cards */
+    .info-overlay {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      padding: 24px 32px;
+      border-radius: 12px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      max-width: 400px;
+      transform: translateY(100px);
+      opacity: 0;
+      animation: slide-up 5s ease-out forwards;
+    }
+    @keyframes slide-up {
+      0%, 10% { transform: translateY(100px); opacity: 0; }
+      20%, 90% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(20px); opacity: 0; }
+    }
+    
+    .step-number {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #f59e0b;
+      margin-bottom: 8px;
+    }
+    
+    .step-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    
+    .step-desc {
+      font-size: 16px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+    
+    /* Feature callout bubbles */
+    .callout {
+      position: absolute;
+      background: rgba(16, 185, 129, 0.95);
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 14px;
+      opacity: 0;
+      animation: pop-in 5s ease-out forwards;
+    }
+    @keyframes pop-in {
+      0%, 30% { transform: scale(0); opacity: 0; }
+      40%, 85% { transform: scale(1); opacity: 1; }
+      95%, 100% { transform: scale(0.8); opacity: 0; }
+    }
+    
+    /* Progress indicator */
+    .progress-dots {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 100;
+    }
+    
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      animation: dot-pulse 30s infinite;
+    }
+    
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 5s; }
+    .dot:nth-child(3) { animation-delay: 10s; }
+    .dot:nth-child(4) { animation-delay: 15s; }
+    .dot:nth-child(5) { animation-delay: 20s; }
+    .dot:nth-child(6) { animation-delay: 25s; }
+    
+    @keyframes dot-pulse {
+      0%, 3% { background: rgba(255,255,255,0.3); transform: scale(1); }
+      5%, 15% { background: #f59e0b; transform: scale(1.3); }
+      18%, 100% { background: rgba(255,255,255,0.3); transform: scale(1); }
+    }
+    
+    /* Brand watermark */
+    .brand {
+      position: absolute;
+      top: 30px;
+      left: 40px;
+      z-index: 100;
+    }
+    .brand-logo {
+      font-size: 24px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #f59e0b, #dc2626);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    /* CTA scene special styling */
+    .cta-scene .info-overlay {
+      left: 50%;
+      bottom: 50%;
+      transform: translate(-50%, 50%);
+      text-align: center;
+      background: rgba(0,0,0,0.9);
+      border: 2px solid #f59e0b;
+      max-width: 500px;
+    }
+    
+    .cta-url {
+      font-family: monospace;
+      font-size: 18px;
+      color: #f59e0b;
+      margin: 16px 0;
+      word-break: break-all;
+    }
+    
+    .zero-fees {
+      font-size: 32px;
+      font-weight: 900;
+      color: #10b981;
+      margin-top: 20px;
+    }
+    
+    /* Vignette overlay */
+    .vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-logo">DeadDropstr</div>
+    </div>
+    
+    <!-- Progress dots -->
+    <div class="progress-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    
+    <!-- Vignette -->
+    <div class="vignette"></div>
+    
+    <!-- Scene 1: Homepage Hero (0-5s) -->
+    <div class="scene">
+      <img src="demo-frames/01_homepage.png" class="screenshot ken-burns" alt="DeadDropstr Homepage">
+      <div class="info-overlay">
+        <div class="step-number">Step 1</div>
+        <div class="step-title">Discover the Network</div>
+        <div class="step-desc">A global marketplace of Nostr-native smart lockers for anonymous P2P exchange</div>
+      </div>
+    </div>
+    
+    <!-- Scene 2: Marketplace Map (5-10s) -->
+    <div class="scene">
+      <img src="demo-frames/02_marketplace.png" class="screenshot ken-burns" alt="Locker Marketplace">
+      <div class="info-overlay">
+        <div class="step-number">Step 2</div>
+        <div class="step-title">Find Local Lockers</div>
+        <div class="step-desc">Browse interactive maps to find available secure boxes near you</div>
+      </div>
+      <div class="callout" style="top: 35%; right: 40%;">📍 24/7 Access</div>
+      <div class="callout" style="top: 55%; right: 25%;">⚡ Lightning Only</div>
+    </div>
+    
+    <!-- Scene 3: Product with Locker Selection (10-15s) -->
+    <div class="scene">
+      <img src="demo-frames/03_product.png" class="screenshot ken-burns" alt="Product Detail">
+      <div class="info-overlay">
+        <div class="step-number">Step 3</div>
+        <div class="step-title">Buy with Bitcoin</div>
+        <div class="step-desc">Purchase items from privacy-focused vendors. Select a locker for secure delivery.</div>
+      </div>
+      <div class="callout" style="top: 45%; left: 30%;">🔒 Privacy First</div>
+    </div>
+    
+    <!-- Scene 4: Owner Dashboard (15-20s) -->
+    <div class="scene">
+      <img src="demo-frames/04_dashboard.png" class="screenshot ken-burns" alt="Owner Dashboard">
+      <div class="info-overlay">
+        <div class="step-number">Step 4</div>
+        <div class="step-title">Own & Configure</div>
+        <div class="step-desc">Set your hourly rate, proxy fees, and access rules. Full owner control.</div>
+      </div>
+      <div class="callout" style="top: 40%; right: 35%;">⚙️ Your Rules</div>
+    </div>
+    
+    <!-- Scene 5: User Dashboard - Active Rentals (20-25s) -->
+    <div class="scene">
+      <img src="demo-frames/05_rentals.png" class="screenshot ken-burns" alt="Active Rentals">
+      <div class="info-overlay">
+        <div class="step-number">Step 5</div>
+        <div class="step-title">Access & Drop</div>
+        <div class="step-desc">Get your access code, tap NFC, or scan QR. Retrieve items on your schedule.</div>
+      </div>
+      <div class="callout" style="top: 35%; left: 35%;">📱 NFC Unlock</div>
+      <div class="callout" style="top: 60%; right: 30%;">⌚ Live Timer</div>
+    </div>
+    
+    <!-- Scene 6: Starter Pack Hardware (25-30s) -->
+    <div class="scene cta-scene">
+      <img src="demo-frames/06_starter.png" class="screenshot ken-burns" alt="DIY Starter Pack">
+      <div class="info-overlay">
+        <div class="step-number">Build Your Own</div>
+        <div class="step-title">$25 Starter Pack</div>
+        <div class="cta-url">plutarchsecho.github.io/nostr-dead-drop-lockers</div>
+        <div class="zero-fees">100% FOSS • 0% Platform Fees</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Prefetch next images for smooth transitions
+    const images = [
+      'demo-frames/01_homepage.png',
+      'demo-frames/02_marketplace.png',
+      'demo-frames/03_product.png',
+      'demo-frames/04_dashboard.png',
+      'demo-frames/05_rentals.png',
+      'demo-frames/06_starter.png'
+    ];
+    images.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  </script>
+</body>
+</html>
