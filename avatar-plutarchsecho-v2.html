@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plutarchsecho Avatar - Concrete</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0a0a0a;
+      margin: 0;
+    }
+    .avatar-container {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="avatar-container">
+    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Face gradient -->
+        <linearGradient id="skinGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#e8d5b5;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#d4c4a8;stop-opacity:1" />
+        </linearGradient>
+        <!-- Hood gradient -->
+        <linearGradient id="hoodGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+        </linearGradient>
+        <!-- Accent gradient -->
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Background circle -->
+      <circle cx="100" cy="100" r="95" fill="url(#hoodGradient)"/>
+      
+      <!-- Hood/head shape -->
+      <path d="M50 180 
+               C50 180, 45 120, 45 90
+               C45 50, 70 25, 100 25
+               C130 25, 155 50, 155 90
+               C155 120, 150 180, 150 180
+               Z" 
+            fill="#1e293b"/>
+      
+      <!-- Face shape -->
+      <ellipse cx="100" cy="95" rx="45" ry="55" fill="url(#skinGradient)"/>
+      
+      <!-- Hair / hood inner -->
+      <path d="M55 85 
+               C55 60, 75 40, 100 40
+               C125 40, 145 60, 145 85
+               L145 70
+               C145 45, 125 30, 100 30
+               C75 30, 55 45, 55 70
+               Z" 
+            fill="#0f172a"/>
+      
+      <!-- Eyes - alert, intelligent -->
+      <ellipse cx="85" cy="90" rx="8" ry="6" fill="#1e293b"/>
+      <ellipse cx="115" cy="90" rx="8" ry="6" fill="#1e293b"/>
+      
+      <!-- Eye highlights -->
+      <circle cx="87" cy="88" r="2" fill="white" opacity="0.8"/>
+      <circle cx="117" cy="88" r="2" fill="white" opacity="0.8"/>
+      
+      <!-- Eyebrows - slightly furrowed, focused -->
+      <path d="M75 82 Q85 80 93 83" stroke="#1e293b" stroke-width="2" fill="none"/>
+      <path d="M107 83 Q115 80 125 82" stroke="#1e293b" stroke-width="2" fill="none"/>
+      
+      <!-- Nose -->
+      <path d="M100 95 L98 105 L102 105 Z" fill="#c4b596"/>
+      <path d="M96 105 Q100 108 104 105" stroke="#b8a88a" stroke-width="1" fill="none"/>
+      
+      <!-- Mouth - slight knowing smile -->
+      <path d="M90 120 Q100 125 110 120" stroke="#1e293b" stroke-width="1.5" fill="none"/>
+      
+      <!-- Stubble / shadow -->
+      <ellipse cx="100" cy="130" rx="25" ry="12" fill="#d4c4a8" opacity="0.5"/>
+      
+      <!-- The "Echo" - dimension double effect -->
+      <g opacity="0.4">
+        <!-- Second face outline -->
+        <ellipse cx="108" cy="95" rx="45" ry="55" fill="none" stroke="#f59e0b" stroke-width="1"/>
+        <!-- Third echo -->
+        <ellipse cx="116" cy="95" rx="45" ry="55" fill="none" stroke="#dc2626" stroke-width="0.5"/>
+      </g>
+      
+      <!-- DeadDropstr accent - small lock icon on hood -->
+      <g transform="translate(140, 55)">
+        <rect x="0" y="4" width="8" height="10" rx="1" fill="#f59e0b"/>
+        <path d="M2 4 L2 2 Q2 0 4 0 Q6 0 6 2 L6 4" stroke="#f59e0b" stroke-width="1.5" fill="none"/>
+      </g>
+      
+      <!-- Lightning accent on shoulder -->
+      <path d="M130 160 L135 170 L132 170 L138 180 L133 180" 
+            stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.8"/>
+      
+      <!-- Border ring -->
+      <circle cx="100" cy="100" r="95" fill="none" stroke="url(#accentGradient)" stroke-width="3"/>
+    </svg>
+  </div>
+</body>
+</html>
