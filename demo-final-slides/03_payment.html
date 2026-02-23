@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #9ca3af;
+    }
+    .card {
+      background: #111827;
+      border-radius: 12px;
+      margin: 0 16px 16px;
+      padding: 24px;
+      border: 1px solid #374151;
+      text-align: center;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .qr-box {
+      width: 180px;
+      height: 180px;
+      background: #fff;
+      margin: 0 auto 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .qr-pattern {
+      width: 140px;
+      height: 140px;
+      background: 
+        repeating-linear-gradient(0deg, #000 0px, #000 8px, transparent 8px, transparent 16px),
+        repeating-linear-gradient(90deg, #000 0px, #000 8px, transparent 8px, transparent 16px);
+    }
+    .bolt {
+      position: absolute;
+      font-size: 48px;
+    }
+    .amount {
+      font-size: 36px;
+      font-weight: 900;
+      color: #f59e0b;
+      margin-bottom: 8px;
+    }
+    .sublabel {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #374151;
+      margin: 20px 0;
+    }
+    .wallet-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-radius: 8px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 12px;
+    }
+    .note {
+      font-size: 12px;
+      color: #6b7280;
+      padding: 12px;
+      background: #1f2937;
+      border-radius: 8px;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      padding: 0 16px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #fff;
+    }
+    .btn-simulate {
+      background: #10b981;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">← Back</div>
+  
+  <div class="card">
+    <div class="title">Complete Payment</div>
+    
+    <div class="qr-box">
+      <div class="qr-pattern"></div>
+      <div class="bolt">⚡</div>
+    </div>
+    
+    <div class="amount">18,000 sats</div>
+    <div class="sublabel">Scan to pay with Lightning</div>
+    
+    <div class="wallet-btn">
+      ⚡ Open in Wallet
+    </div>
+    
+    <div class="note">
+      Demo mode: Click "Pay" to simulate
+    </div>
+  </div>
+  
+  <div class="buttons">
+    <div class="btn btn-outline">Back</div>
+    <div class="btn btn-simulate">⚡ Simulate Payment</div>
+  </div>
+</body>
+</html>

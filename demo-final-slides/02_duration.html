@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #9ca3af;
+    }
+    .card {
+      background: #111827;
+      border-radius: 12px;
+      margin: 0 16px 16px;
+      padding: 24px;
+      border: 1px solid #374151;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .hours-label {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+    .hours-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #f59e0b;
+      margin-bottom: 16px;
+    }
+    .slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #374151;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .slider-fill {
+      height: 100%;
+      width: 15%;
+      background: linear-gradient(90deg, #f59e0b, #dc2626);
+      border-radius: 4px;
+    }
+    .slider-thumb {
+      position: absolute;
+      left: 15%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: #f59e0b;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(245,158,11,0.4);
+    }
+    .labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #374151;
+      margin: 16px 0;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+    .row .muted {
+      color: #9ca3af;
+    }
+    .total {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .usd {
+      text-align: right;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      padding: 0 16px;
+    }
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #fff;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">← Back</div>
+  
+  <div class="card">
+    <div class="title">Select Rental Duration</div>
+    
+    <div class="hours-label">Rental Hours</div>
+    <div class="hours-value">24 hrs</div>
+    
+    <div class="slider">
+      <div class="slider-fill"></div>
+      <div class="slider-thumb"></div>
+    </div>
+    <div class="labels">
+      <span>1 hour</span>
+      <span>1 week</span>
+    </div>
+    
+    <hr>
+    
+    <div class="row">
+      <span class="muted">Hourly rate</span>
+      <span>750 sats</span>
+    </div>
+    <div class="row">
+      <span class="muted">Duration</span>
+      <span>24 hours</span>
+    </div>
+    
+    <hr>
+    
+    <div class="row total">
+      <span>Total</span>
+      <span>18,000 sats</span>
+    </div>
+    <div class="usd">≈ $6.24 USD</div>
+  </div>
+  
+  <div class="buttons">
+    <div class="btn btn-outline">Back</div>
+    <div class="btn btn-primary">Continue</div>
+  </div>
+</body>
+</html>
