@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plutarchsecho - Historic</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0a0a0a;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Stone/Plaster texture -->
+      <linearGradient id="stoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#f5f0e6;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#e8e0d0;stop-opacity:1" />
+      </linearGradient>
+      <!-- Shadow for depth -->
+      <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#d4c8b0;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#c4b8a0;stop-opacity:1" />
+      </linearGradient>
+      <!-- Accent gradient - ancient bronze/gold -->
+      <linearGradient id="bronzeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#d4a574;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#8b6914;stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    
+    <!-- Background - aged stone circle -->
+    <circle cx="100" cy="100" r="95" fill="#1a1a1a"/>
+    <circle cx="100" cy="100" r="92" fill="#2a2a2a"/>
+    
+    <!-- Bust outline - classical style -->
+    <path d="M45 170 
+             C45 170, 40 140, 42 110
+             C44 80, 60 55, 85 45
+             C100 25, 120 35, 130 45
+             C155 55, 165 80, 165 110
+             C165 140, 160 170, 160 170
+             Z" 
+          fill="url(#stoneGradient)"/>
+    
+    <!-- Neck/chest drape -->
+    <path d="M50 150 
+             Q100 165 155 150
+             L160 170
+             Q100 180 40 170
+             Z" 
+          fill="#e0d8c8"/>
+    
+    <!-- Face - philosopher features -->
+    <ellipse cx="100" cy="95" rx="40" ry="48" fill="url(#stoneGradient)"/>
+    
+    <!-- Brow ridge - prominent, thoughtful -->
+    <path d="M65 85 Q85 78 100 82 Q115 78 135 85" 
+          stroke="#c8bca0" stroke-width="2" fill="none"/>
+    
+    <!-- Deep set eyes - contemplative -->
+    <ellipse cx="82" cy="92" rx="9" ry="7" fill="#1a1815"/>
+    <ellipse cx="118" cy="92" rx="9" ry="7" fill="#1a1815"/>
+    <!-- Eye highlights - amber/bronze (Echo from another dimension) -->
+    <circle cx="84" cy="90" r="2" fill="#d4a574"/>
+    <circle cx="120" cy="90" r="2" fill="#d4a574"/>
+    <circle cx="84" cy="90" r="1" fill="#f5e6d3" opacity="0.6"/>
+    <circle cx="120" cy="90" r="1" fill="#f5e6d3" opacity="0.6"/>
+    
+    <!-- Strong nose - Roman/Greek -->
+    <path d="M100 85 L98 108 L102 108 Z" fill="url(#shadowGradient)"/>
+    <path d="M95 108 Q100 112 105 108" stroke="#c4b8a0" stroke-width="1" fill="none"/>
+    
+    <!-- Beard - philosopher style -->
+    <path d="M65 115 
+             Q65 145 100 150
+             Q135 145 135 115
+             L135 125
+             Q135 155 100 160
+             Q65 155 65 125
+             Z" 
+          fill="#5a5040"/>
+    <!-- Beard texture -->
+    <path d="M75 130 Q85 140 90 135" stroke="#4a4030" stroke-width="1" fill="none"/>
+    <path d="M85 140 Q95 145 100 140" stroke="#4a4030" stroke-width="1" fill="none"/>
+    <path d="M110 135 Q115 140 125 130" stroke="#4a4030" stroke-width="1" fill="none"/>
+    
+    <!-- Mustache -->
+    <path d="M85 118 Q100 122 115 118" stroke="#5a5040" stroke-width="3" fill="none"/>
+    
+    <!-- Hair - swept back, dignified -->
+    <path d="M52 90 
+             C50 70, 70 45, 100 40
+             C130 45, 150 70, 148 90
+             L150 70
+             C145 50, 125 35, 100 38
+             C75 35, 55 50, 50 70
+             Z" 
+          fill="#5a5040"/>
+    <!-- Hair waves -->
+    <path d="M60 60 Q75 55 90 58" stroke="#4a4030" stroke-width="1" fill="none"/>
+    <path d="M95 55 Q110 52 125 58" stroke="#4a4030" stroke-width="1" fill="none"/>
+    <path d="M130 65 Q140 75 142 85" stroke="#4a4030" stroke-width="1" fill="none"/>
+    
+    <!-- Mouth - serious, stoic -->
+    <path d="M92 126 Q100 128 108 126" stroke="#8a7a60" stroke-width="1.5" fill="none"/>
+    
+    <!-- Ear (left visible) -->
+    <ellipse cx="52" cy="100" rx="5" ry="10" fill="url(#shadowGradient)"/>
+    <path d="M50 96 Q48 100 50 104" stroke="#b8a890" stroke-width="1" fill="none"/>
+    
+    <!-- Toga/clothing fold lines -->
+    <path d="M55 140 Q70 145 80 138" stroke="#d4c8b0" stroke-width="1.5" fill="none"/>
+    <path d="M120 138 Q140 142 150 140" stroke="#d4c8b0" stroke-width="1.5" fill="none"/>
+    
+    <!-- The "Echo" - classical ghost effect -->
+    <g opacity="0.25">
+      <!-- Fainter duplicate behind -->
+      <ellipse cx="108" cy="95" rx="40" ry="48" fill="none" stroke="#d4a574" stroke-width="1"/>
+      <ellipse cx="116" cy="95" rx="40" ry="48" fill="none" stroke="#8b6914" stroke-width="0.5"/>
+    </g>
+    
+    <!-- Greek key pattern border (meander) -->
+    <g stroke="url(#bronzeGradient)" stroke-width="2" fill="none">
+      <path d="M30 100 L35 100 L35 95 L40 95 L40 100 L45 100"/>
+      <path d="M155 100 L160 100 L160 95 L165 95 L165 100 L170 100"/>
+      <path d="M100 30 L100 35 L95 35 L95 40 L100 40 L100 45"/>
+      <path d="M100 155 L100 160 L95 160 L95 165 L100 165 L100 170"/>
+    </g>
+    
+    <!-- Ancient lock symbol - DeadDropstr connection -->
+    <g transform="translate(145, 145)">
+      <rect x="2" y="6" width="10" height="12" rx="1" fill="#8b6914"/>
+      <path d="M5 6 L5 3 Q5 1 7 1 Q9 1 9 3 L9 6" stroke="#8b6914" stroke-width="2" fill="none"/>
+      <circle cx="7" cy="12" r="1.5" fill="#d4c574"/>
+    </g>
+    
+    <!-- Outer ring - bronze -->
+    <circle cx="100" cy="100" r="95" fill="none" stroke="url(#bronzeGradient)" stroke-width="3"/>
+    <!-- Decorative dots -->
+    <circle cx="100" cy="8" r="3" fill="#d4a574"/>
+    <circle cx="100" cy="192" r="3" fill="#d4a574"/>
+    <circle cx="8" cy="100" r="3" fill="#d4a574"/>
+    <circle cx="192" cy="100" r="3" fill="#d4a574"/>
+  </svg>
+</body>
+</html>
