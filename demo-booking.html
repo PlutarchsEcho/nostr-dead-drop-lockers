@@ -3,341 +3,258 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DeadDropstr - Book a Locker in 30 Seconds</title>
+  <title>DeadDropstr - Book a Locker</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --primary: #f59e0b;
-      --accent: #dc2626;
-      --success: #10b981;
-    }
-    
     body {
       background: #0a0a0a;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #fff;
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    
-    /* Mobile-first: Full screen */
     .demo-container {
-      flex: 1;
+      width: 100%;
+      max-width: 1000px;
+      aspect-ratio: 16/9;
       position: relative;
       background: #000;
+      border-radius: 16px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     }
-    
-    @media (min-width: 769px) {
-      body {
-        padding: 20px;
-        align-items: center;
-        justify-content: center;
-      }
-      .demo-container {
-        width: 100%;
-        max-width: 800px;
-        aspect-ratio: 9/16;
-        border-radius: 16px;
-        max-height: 90vh;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-      }
-    }
-    
     @media (max-width: 768px) {
+      body { padding: 0; }
       .demo-container {
+        max-width: 100%;
+        aspect-ratio: 9/16;
+        border-radius: 0;
         height: 100vh;
-        width: 100vw;
       }
     }
-    
     .scene {
       position: absolute;
       inset: 0;
       opacity: 0;
-      animation: scene-cycle 24s infinite;
-      display: flex;
-      flex-direction: column;
+      animation: scene-cycle 30s infinite;
     }
-    
-    /* 4 scenes: 0s, 6s, 12s, 18s */
     .scene:nth-child(1) { animation-delay: 0s; }
     .scene:nth-child(2) { animation-delay: 6s; }
     .scene:nth-child(3) { animation-delay: 12s; }
     .scene:nth-child(4) { animation-delay: 18s; }
-    
+    .scene:nth-child(5) { animation-delay: 24s; }
     @keyframes scene-cycle {
       0%, 2% { opacity: 0; transform: translateX(20px); }
-      5%, 20% { opacity: 1; transform: translateX(0); }
-      23%, 100% { opacity: 0; transform: translateX(-20px); }
+      5%, 18% { opacity: 1; transform: translateX(0); }
+      22%, 100% { opacity: 0; transform: translateX(-20px); }
     }
-    
     .screenshot-frame {
-      flex: 1;
-      position: relative;
+      position: absolute;
+      inset: 0;
       overflow: hidden;
-      background: #111827;
     }
-    
-    /* CRITICAL: Use contain on mobile to show full screenshot */
     .screenshot {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      object-position: center top;
-      background: #111827;
+      object-fit: cover;
+      animation: ken-burns 6s ease-out forwards;
     }
-    
-    @media (min-width: 769px) {
-      .screenshot {
-        object-fit: cover;
-      }
+    @keyframes ken-burns {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
     }
-    
     .info-overlay {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.95) 20%);
-      padding: 40px 20px 50px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.95) 30%);
+      padding: 50px 30px 30px;
+      transform: translateY(100%);
       animation: slide-up 6s ease-out forwards;
     }
-    
     @keyframes slide-up {
-      0%, 8% { opacity: 0; transform: translateY(30px); }
-      15%, 85% { opacity: 1; transform: translateY(0); }
-      92%, 100% { opacity: 0; transform: translateY(10px); }
+      0%, 10% { transform: translateY(100%); opacity: 0; }
+      20%, 85% { transform: translateY(0); opacity: 1; }
+      95%, 100% { transform: translateY(20px); opacity: 0; }
     }
-    
     .step-number {
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--primary);
-      margin-bottom: 6px;
+      letter-spacing: 2px;
+      color: #f59e0b;
+      margin-bottom: 8px;
     }
-    
     .step-title {
-      font-size: clamp(20px, 5vw, 28px);
+      font-size: clamp(24px, 4vw, 36px);
       font-weight: 800;
-      margin-bottom: 6px;
-      line-height: 1.2;
+      margin-bottom: 10px;
     }
-    
     .step-desc {
-      font-size: clamp(13px, 3.5vw, 16px);
+      font-size: clamp(14px, 2vw, 18px);
       color: #9ca3af;
-      line-height: 1.4;
+      line-height: 1.5;
     }
-    
     .highlight {
       position: absolute;
-      background: var(--success);
+      background: #10b981;
       color: #000;
-      padding: 6px 12px;
-      border-radius: 16px;
+      padding: 8px 16px;
+      border-radius: 20px;
       font-weight: 700;
-      font-size: 12px;
+      font-size: 14px;
       animation: pop-in 6s ease-out forwards;
-      box-shadow: 0 4px 12px rgba(16,185,129,0.4);
-      z-index: 10;
     }
-    
     @keyframes pop-in {
-      0%, 20% { transform: scale(0); opacity: 0; }
-      30%, 80% { transform: scale(1); opacity: 1; }
-      88%, 100% { transform: scale(0.9); opacity: 0; }
+      0%, 25% { transform: scale(0); opacity: 0; }
+      35%, 80% { transform: scale(1); opacity: 1; }
+      90%, 100% { transform: scale(0.9); opacity: 0; }
     }
-    
     .progress-bar {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 3px;
+      height: 4px;
       background: rgba(255,255,255,0.1);
-      z-index: 100;
     }
-    
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--primary), var(--accent));
+      background: linear-gradient(90deg, #f59e0b, #dc2626);
       width: 0%;
-      animation: progress 24s linear infinite;
+      animation: progress 30s linear infinite;
     }
-    
     @keyframes progress {
       0% { width: 0%; }
       100% { width: 100%; }
     }
-    
     .step-dots {
       position: absolute;
-      bottom: 12px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
-      gap: 8px;
+      gap: 10px;
       z-index: 100;
     }
-    
     .step-dot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: rgba(255,255,255,0.3);
-      animation: dot-active 24s infinite;
+      animation: dot-active 30s infinite;
     }
-    
     .step-dot:nth-child(1) { animation-delay: 0s; }
     .step-dot:nth-child(2) { animation-delay: 6s; }
     .step-dot:nth-child(3) { animation-delay: 12s; }
     .step-dot:nth-child(4) { animation-delay: 18s; }
-    
+    .step-dot:nth-child(5) { animation-delay: 24s; }
     @keyframes dot-active {
-      0%, 3% { background: rgba(255,255,255,0.3); transform: scale(1); }
-      6%, 18% { background: var(--primary); transform: scale(1.4); }
-      22%, 100% { background: rgba(255,255,255,0.3); transform: scale(1); }
+      0%, 3% { background: rgba(255,255,255,0.3); }
+      6%, 16% { background: #f59e0b; transform: scale(1.3); }
+      20%, 100% { background: rgba(255,255,255,0.3); transform: scale(1); }
     }
-    
     .brand {
       position: absolute;
-      top: 12px;
-      left: 16px;
+      top: 20px;
+      left: 30px;
       z-index: 100;
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 900;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
+      background: linear-gradient(135deg, #f59e0b, #dc2626);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    
-    /* Scene 4: Success is special */
-    .success-content {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 30px;
-      text-align: center;
-      background: linear-gradient(180deg, #0a0a0a 0%, #111827 100%);
-    }
-    
-    .lock-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-      animation: unlock-bounce 2s ease-in-out infinite;
-    }
-    
-    @keyframes unlock-bounce {
-      0%, 100% { transform: scale(1) translateY(0); }
-      50% { transform: scale(1.1) translateY(-8px); }
-    }
-    
-    .access-code {
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 32px;
-      font-weight: 700;
-      background: #000;
-      padding: 16px 32px;
-      border-radius: 12px;
-      border: 2px solid var(--primary);
-      color: var(--primary);
-      letter-spacing: 4px;
-      margin: 16px 0;
-    }
-    
-    .success-url {
-      font-size: 12px;
-      color: var(--primary);
+    .cta-url {
       font-family: monospace;
-      margin-top: 20px;
-      word-break: break-all;
+      font-size: 16px;
+      color: #f59e0b;
     }
-    
     .zero-fees {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--success);
-      margin-top: 12px;
+      font-size: 28px;
+      font-weight: 900;
+      color: #10b981;
     }
   </style>
 </head>
 <body>
   <div class="demo-container">
     <div class="brand">DeadDropstr</div>
-    
     <div class="step-dots">
       <div class="step-dot"></div>
       <div class="step-dot"></div>
       <div class="step-dot"></div>
       <div class="step-dot"></div>
+      <div class="step-dot"></div>
     </div>
-    
     <div class="progress-bar"><div class="progress-fill"></div></div>
     
-    <!-- Scene 1: Find (Marketplace Map) -->
+    <!-- Scene 1: Map -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-frames/02_marketplace.png" class="screenshot" alt="Find">
+        <img src="demo-frames/02_marketplace.png" class="screenshot" alt="Map">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 1</div>
-        <div class="step-title">Find Nearby Lockers</div>
-        <div class="step-desc">Browse the map. Filter by price, features, location.</div>
+        <div class="step-title">Find a Locker</div>
+        <div class="step-desc">Browse the map to find secure lockers near you</div>
       </div>
-      <div class="highlight" style="top:28%;right:30%">📍 Brooklyn</div>
-      <div class="highlight" style="top:42%;left:25%">750 sats/hr</div>
+      <div class="highlight" style="top:30%;right:35%">📍 San Francisco</div>
+      <div class="highlight" style="top:45%;left:30%">⚡ 500 sats/hr</div>
     </div>
     
-    <!-- Scene 2: Select (Locker Detail) -->
+    <!-- Scene 2: Locker Details -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-flow-steps/01_locker-detail.png" class="screenshot" alt="Select">
+        <img src="demo-frames/01_homepage.png" class="screenshot" alt="Details">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 2</div>
-        <div class="step-title">Check & Select</div>
-        <div class="step-desc">View details. Tap "Rent This Locker" to book.</div>
+        <div class="step-title">Check Availability</div>
+        <div class="step-desc">View features, location, and pricing</div>
       </div>
-      <div class="highlight" style="top:38%;right:20%">✓ Available</div>
+      <div class="highlight" style="top:35%;right:25%">✓ Available Now</div>
     </div>
     
-    <!-- Scene 3: Book (Product/Payment) -->
+    <!-- Scene 3: Duration -->
     <div class="scene">
       <div class="screenshot-frame">
-        <img src="demo-frames/03_product.png" class="screenshot" alt="Book">
+        <img src="demo-frames/05_rentals.png" class="screenshot" alt="Duration">
       </div>
       <div class="info-overlay">
         <div class="step-number">Step 3</div>
-        <div class="step-title">Book & Pay</div>
-        <div class="step-desc">Choose hours. Pay with Lightning. Instant confirmation.</div>
+        <div class="step-title">Select Duration</div>
+        <div class="step-desc">Choose how long you need the locker</div>
       </div>
-      <div class="highlight" style="top:45%;left:20%">⚡ 12,000 sats</div>
+      <div class="highlight" style="top:40%;left:35%">24 hrs = 12,000 sats</div>
     </div>
     
-    <!-- Scene 4: Success (Access Code) -->
+    <!-- Scene 4: Payment -->
     <div class="scene">
       <div class="screenshot-frame">
-        <div class="success-content">
-          <div class="lock-icon">🔓</div>
-          <div class="step-number" style="margin-bottom:4px;">Step 4</div>
-          <div class="step-title" style="font-size:28px;">Access Granted!</div>
-          <div class="step-desc" style="margin:8px 0 16px;">Your locker is ready</div>
-          
-          <div class="access-code">A7B9C2</div>
-          <div class="step-desc">Tap NFC or enter code</div>
-          
-          <div class="success-url">
-            plutarchsecho.github.io/nostr-dead-drop-lockers
-          </div>
-          <div class="zero-fees">100% FOSS • 0% Fees</div>
+        <img src="demo-frames/03_product.png" class="screenshot" alt="Payment">
+      </div>
+      <div class="info-overlay">
+        <div class="step-number">Step 4</div>
+        <div class="step-title">Pay with Lightning</div>
+        <div class="step-desc">Scan QR or pay with your wallet</div>
+      </div>
+      <div class="highlight" style="top:50%;right:30%">⚡ Instant</div>
+    </div>
+    
+    <!-- Scene 5: Success -->
+    <div class="scene">
+      <div class="screenshot-frame" style="background:#0a0a0a;display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;padding:40px;">
+          <div style="font-size:64px;margin-bottom:20px;">🔓</div>
+          <div class="step-title">Access Granted</div>
+          <div class="step-desc" style="margin-bottom:20px;">Your code: <span style="font-family:monospace;background:#111;padding:4px 12px;border-radius:4px;">A7B9C2</span></div>
+          <div class="cta-url">plutarchsecho.github.io/nostr-dead-drop-lockers</div>
+          <div class="zero-fees" style="margin-top:15px;">0% Platform Fees</div>
         </div>
       </div>
     </div>
