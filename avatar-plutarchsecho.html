@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plutarchsecho Avatar</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0a0a0a;
+      margin: 0;
+    }
+    .avatar-container {
+      position: relative;
+    }
+    /* Glow effect */
+    .avatar-container::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+  </style>
+</head>
+<body>
+  <div class="avatar-container">
+    <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradient matching DeadDropstr brand -->
+        <linearGradient id="headGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="faceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#0f0f1a;stop-opacity:1" />
+        </linearGradient>
+        <!-- Circuit pattern -->
+        <pattern id="circuitPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="10" cy="10" r="1.5" fill="#f59e0b" opacity="0.3"/>
+          <path d="M10 0 L10 20 M0 10 L20 10" stroke="#f59e0b" stroke-width="0.5" opacity="0.2"/>
+        </pattern>
+      </defs>
+      
+      <!-- Background circle with gradient -->
+      <circle cx="100" cy="100" r="90" fill="url(#headGradient)"/>
+      
+      <!-- Dimension fold effect (the "echo from another dimension") -->
+      <circle cx="100" cy="100" r="85" fill="#0a0a0a"/>
+      <circle cx="102" cy="98" r="83" fill="url(#faceGradient)"/>
+      
+      <!-- Circuit lines (tech/privacy motif) -->
+      <path d="M40 60 Q80 50 100 70 T160 60" stroke="#f59e0b" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M35 100 Q70 90 100 100 T165 100" stroke="#dc2626" stroke-width="1.5" fill="none" opacity="0.6"/>
+      <path d="M40 140 Q80 130 100 150 T160 140" stroke="#f59e0b" stroke-width="1.5" fill="none" opacity="0.6"/>
+      
+      <!-- Eyes - glowing (mysterious, watching) -->
+      <ellipse cx="75" cy="85" rx="12" ry="8" fill="#f59e0b">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite"/>
+      </ellipse>
+      <ellipse cx="125" cy="85" rx="12" ry="8" fill="#f59e0b">
+        <animate attributeName="opacity" values="0.7;1;0.7" dur="4s" repeatCount="indefinite"/>
+      </ellipse>
+      
+      <!-- Pupils - Lightning bolts (DeadDropstr connection) -->
+      <path d="M72 82 L76 85 L73 88 L77 85 Z" fill="#0a0a0a"/>
+      <path d="M122 82 L126 85 L123 88 L127 85 Z" fill="#0a0a0a"/>
+      
+      <!-- Hood/shadow lines (anonymous figure) -->
+      <path d="M50 50 Q100 30 150 50" stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.8"/>
+      <path d="M45 65 Q100 45 155 65" stroke="#dc2626" stroke-width="1.5" fill="none" opacity="0.6"/>
+      
+      <!-- Lock motif (DeadDropstr connection) -->
+      <rect x="92" y="110" width="16" height="20" rx="2" fill="#f59e0b" opacity="0.9"/>
+      <path d="M96 110 L96 105 Q96 100 100 100 Q104 100 104 105 L104 110" stroke="#f59e0b" stroke-width="2" fill="none"/>
+      <circle cx="100" cy="120" r="3" fill="#0a0a0a"/>
+      
+      <!-- QR code hint (bottom - privacy/tech) -->
+      <rect x="70" y="145" width="4" height="4" fill="#10b981" opacity="0.8"/>
+      <rect x="78" y="145" width="4" height="4" fill="#10b981" opacity="0.8"/>
+      <rect x="70" y="153" width="4" height="4" fill="#10b981" opacity="0.8"/>
+      <rect x="126" y="145" width="4" height="4" fill="#10b981" opacity="0.8"/>
+      <rect x="118" y="153" width="4" height="4" fill="#10b981" opacity="0.8"/>
+      
+      <!-- Dimension waves (the "echo") -->
+      <path d="M50 175 Q100 185 150 175" stroke="#f59e0b" stroke-width="1" fill="none" opacity="0.4">
+        <animate attributeName="d" values="M50 175 Q100 185 150 175;M50 177 Q100 167 150 177;M50 175 Q100 185 150 175" dur="3s" repeatCount="indefinite"/>
+      </path>
+      <path d="M55 180 Q100 190 145 180" stroke="#dc2626" stroke-width="1" fill="none" opacity="0.3">
+        <animate attributeName="d" values="M55 180 Q100 190 145 180;M55 182 Q100 172 145 182;M55 180 Q100 190 145 180" dur="3s" repeatCount="indefinite"/>
+      </path>
+    </svg>
+  </div>
+</body>
+</html>
